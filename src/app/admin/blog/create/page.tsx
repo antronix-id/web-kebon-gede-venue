@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Save } from "lucide-react";
+import { createBlogPost } from "@/actions/blog";
 
 export default function AdminCreateBlogPage() {
   const router = useRouter();
@@ -18,13 +19,39 @@ export default function AdminCreateBlogPage() {
     tags: "Wedding, Palembang, Tips",
   });
   const [isSaved, setIsSaved] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSaved(true);
-    setTimeout(() => {
-      router.push("/admin/blog");
-    }, 1000);
+    setIsSubmitting(true);
+    setErrorMessage("");
+
+    try {
+      const res = await createBlogPost({
+        title: formData.title,
+        slug: formData.slug || formData.title.toLowerCase().replace(/\s+/g, "-"),
+        excerpt: formData.excerpt,
+        content: formData.content,
+        cover_image_url: formData.cover_image_url,
+        author_name: formData.author_name,
+        status: formData.status as any,
+        tags: formData.tags.split(",").map((t) => t.trim()).filter(Boolean),
+      });
+
+      if (res.success) {
+        setIsSaved(true);
+        setTimeout(() => {
+          router.push("/admin/blog");
+        }, 800);
+      } else {
+        setErrorMessage(res.error || "Gagal menyimpan artikel blog");
+        setIsSubmitting(false);
+      }
+    } catch (err: any) {
+      setErrorMessage(err?.message || "Terjadi kesalahan pada server");
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -49,6 +76,12 @@ export default function AdminCreateBlogPage() {
       {isSaved && (
         <div className="p-4 rounded-xl bg-green-50 border border-green-200 text-green-700 text-sm font-semibold">
           Artikel berhasil dipublikasikan! Mengalihkan...
+        </div>
+      )}
+
+      {errorMessage && (
+        <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm font-semibold">
+          {errorMessage}
         </div>
       )}
 

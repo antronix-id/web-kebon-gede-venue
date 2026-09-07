@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { MapPin, Phone, Mail, Clock } from "lucide-react";
+import { MapPin, Phone, Mail, Clock, Lock } from "lucide-react";
 import { getSetting } from "@/lib/seed-data";
 
 export default function Footer() {
@@ -91,9 +91,18 @@ export default function Footer() {
           <p className="text-gray-500 text-sm">
             © {new Date().getFullYear()} Kebon Gede Venue. All rights reserved.
           </p>
-          <p className="text-gray-500 text-xs">
-            Built with ❤️ by Rianpedia
-          </p>
+          <div className="flex items-center gap-4 text-xs text-gray-500">
+            <span>Built with ❤️ by Rianpedia</span>
+            <span className="text-gray-600">•</span>
+            <Link
+              href="/admin/login"
+              className="inline-flex items-center gap-1.5 text-gray-400 hover:text-gold transition-colors py-1 px-2.5 rounded-lg hover:bg-white/5 border border-transparent hover:border-white/10"
+              title="Akses Portal Admin"
+            >
+              <Lock className="w-3.5 h-3.5" />
+              <span>Admin Login</span>
+            </Link>
+          </div>
         </div>
       </div>
     </footer>

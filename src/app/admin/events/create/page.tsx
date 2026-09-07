@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Save } from "lucide-react";
 import { venues } from "@/lib/seed-data";
+import { createEvent } from "@/actions/events";
 
 export default function AdminCreateEventPage() {
   const router = useRouter();
@@ -20,13 +21,40 @@ export default function AdminCreateEventPage() {
     is_published: true,
   });
   const [isSaved, setIsSaved] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSaved(true);
-    setTimeout(() => {
-      router.push("/admin/events");
-    }, 1000);
+    setIsSubmitting(true);
+    setErrorMessage("");
+
+    try {
+      const res = await createEvent({
+        title: formData.title,
+        slug: formData.slug || formData.title.toLowerCase().replace(/\s+/g, "-"),
+        description: formData.description,
+        content: formData.content,
+        cover_image_url: formData.cover_image_url,
+        event_date: formData.event_date,
+        event_type: formData.event_type as any,
+        venue_id: formData.venue_id,
+        is_published: formData.is_published,
+      });
+
+      if (res.success) {
+        setIsSaved(true);
+        setTimeout(() => {
+          router.push("/admin/events");
+        }, 800);
+      } else {
+        setErrorMessage(res.error || "Gagal menyimpan event");
+        setIsSubmitting(false);
+      }
+    } catch (err: any) {
+      setErrorMessage(err?.message || "Terjadi kesalahan pada server");
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -51,6 +79,12 @@ export default function AdminCreateEventPage() {
       {isSaved && (
         <div className="p-4 rounded-xl bg-green-50 border border-green-200 text-green-700 text-sm font-semibold">
           Data event baru berhasil disimpan! Mengalihkan...
+        </div>
+      )}
+
+      {errorMessage && (
+        <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm font-semibold">
+          {errorMessage}
         </div>
       )}
 

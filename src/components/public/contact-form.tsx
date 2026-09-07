@@ -4,8 +4,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useState, useEffect } from "react";
-import { Send, CheckCircle } from "lucide-react";
-import type { ContactFormData } from "@/types";
+import { Send, CheckCircle, AlertCircle } from "lucide-react";
+import { submitContactMessage } from "@/actions/contact";
 
 const contactSchema = z.object({
   name: z.string().min(2, "Nama minimal 2 karakter"),
@@ -15,13 +15,14 @@ const contactSchema = z.object({
   venue_preference: z.string().optional(),
   preferred_date: z.string().optional(),
   estimated_guests: z.coerce.number().min(0).optional(),
-  message: z.string().min(10, "Pesan minimal 10 karakter"),
+  message: z.string().min(5, "Pesan minimal 5 karakter"),
 });
 
 type ContactFormValues = z.infer<typeof contactSchema>;
 
 export default function ContactForm() {
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [serverError, setServerError] = useState("");
 
   const {
     register,
@@ -46,12 +47,19 @@ export default function ContactForm() {
   }, [setValue]);
 
   const onSubmit = async (data: ContactFormValues) => {
-    // Simulate API call
-    console.log("Form submitted:", data);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setIsSubmitted(true);
-    reset();
-    setTimeout(() => setIsSubmitted(false), 5000);
+    setServerError("");
+    try {
+      const res = await submitContactMessage(data as any);
+      if (res.success) {
+        setIsSubmitted(true);
+        reset();
+        setTimeout(() => setIsSubmitted(false), 6000);
+      } else {
+        setServerError(res.error || "Gagal mengirim pesan. Silakan coba lagi.");
+      }
+    } catch (err: any) {
+      setServerError(err?.message || "Terjadi kendala saat mengirim pesan.");
+    }
   };
 
   if (isSubmitted) {
@@ -66,6 +74,12 @@ export default function ContactForm() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+      {serverError && (
+        <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs sm:text-sm flex items-center gap-2">
+          <AlertCircle className="w-4 h-4 shrink-0 text-red-500" />
+          <span>{serverError}</span>
+        </div>
+      )}
       {/* Name */}
       <div>
         <label htmlFor="contact-name" className="block text-xs sm:text-sm font-semibold text-charcoal mb-1.5">Nama Lengkap *</label>

@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Lock, Mail, ArrowRight, CheckCircle } from "lucide-react";
+import { Lock, Mail, ArrowRight } from "lucide-react";
+import { loginAdminAction } from "@/actions/auth";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -12,19 +13,24 @@ export default function AdminLoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
 
-    setTimeout(() => {
-      if (email && password) {
+    try {
+      const res = await loginAdminAction({ email, password });
+      if (res.success) {
         router.push("/admin/dashboard");
+        router.refresh();
       } else {
-        setError("Email dan password wajib diisi");
+        setError(res.error || "Gagal masuk. Periksa email dan password Anda.");
         setIsLoading(false);
       }
-    }, 600);
+    } catch (err: any) {
+      setError(err?.message || "Terjadi kesalahan saat mencoba masuk.");
+      setIsLoading(false);
+    }
   };
 
   return (

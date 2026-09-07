@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Save, Upload } from "lucide-react";
 import type { Venue } from "@/types";
+import { updateVenue } from "@/actions/venues";
 
 interface AdminEditVenueFormProps {
   venue: Venue;
@@ -25,13 +26,41 @@ export default function AdminEditVenueForm({ venue }: AdminEditVenueFormProps) {
     is_active: venue.is_active,
   });
   const [isSaved, setIsSaved] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSaved(true);
-    setTimeout(() => {
-      router.push("/admin/venues");
-    }, 1000);
+    setIsSubmitting(true);
+    setErrorMessage("");
+
+    try {
+      const res = await updateVenue(venue.id, {
+        name: formData.name,
+        slug: formData.slug,
+        venue_type: formData.venue_type as any,
+        capacity_min: Number(formData.capacity_min),
+        capacity_max: Number(formData.capacity_max),
+        short_description: formData.short_description,
+        full_description: formData.full_description,
+        facilities: formData.facilities.split(",").map((s) => s.trim()).filter(Boolean),
+        hero_image_url: formData.hero_image_url,
+        is_active: formData.is_active,
+      });
+
+      if (res.success) {
+        setIsSaved(true);
+        setTimeout(() => {
+          router.push("/admin/venues");
+        }, 800);
+      } else {
+        setErrorMessage(res.error || "Gagal memperbarui venue");
+        setIsSubmitting(false);
+      }
+    } catch (err: any) {
+      setErrorMessage(err?.message || "Terjadi kesalahan pada server");
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -39,6 +68,12 @@ export default function AdminEditVenueForm({ venue }: AdminEditVenueFormProps) {
       {isSaved && (
         <div className="p-4 rounded-xl bg-green-50 border border-green-200 text-green-700 text-sm font-semibold">
           Perubahan venue berhasil disimpan! Mengalihkan...
+        </div>
+      )}
+
+      {errorMessage && (
+        <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm font-semibold">
+          {errorMessage}
         </div>
       )}
 
