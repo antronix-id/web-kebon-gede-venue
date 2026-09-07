@@ -3,25 +3,31 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Save } from "lucide-react";
-import { venues } from "@/lib/seed-data";
-import { createEvent } from "@/actions/events";
+import { Save, Loader2 } from "lucide-react";
+import type { EventItem, Venue } from "@/types";
+import { updateEvent } from "@/actions/events";
 import { ImageUpload } from "@/components/admin/image-upload";
-import { STORAGE_BUCKETS } from "@/lib/constants";
+import { STORAGE_BUCKETS, EVENT_TYPES } from "@/lib/constants";
 
-export default function AdminCreateEventPage() {
+interface AdminEditEventFormProps {
+  event: EventItem;
+  venues: Venue[];
+}
+
+export default function AdminEditEventForm({ event, venues }: AdminEditEventFormProps) {
   const router = useRouter();
   const [formData, setFormData] = useState({
-    title: "",
-    slug: "",
-    description: "",
-    content: "",
-    cover_image_url: "/images/7.png",
-    event_date: new Date().toISOString().split("T")[0],
-    event_type: "wedding",
-    venue_id: venues[0]?.id || "",
-    is_published: true,
+    title: event.title,
+    slug: event.slug,
+    description: event.description,
+    content: event.content,
+    cover_image_url: event.cover_image_url,
+    event_date: event.event_date ? event.event_date.split("T")[0] : new Date().toISOString().split("T")[0],
+    event_type: event.event_type,
+    venue_id: event.venue_id || (venues[0]?.id ?? ""),
+    is_published: event.is_published,
   });
+
   const [isSaved, setIsSaved] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -32,9 +38,9 @@ export default function AdminCreateEventPage() {
     setErrorMessage("");
 
     try {
-      const res = await createEvent({
+      const res = await updateEvent(event.id, {
         title: formData.title,
-        slug: formData.slug || formData.title.toLowerCase().replace(/\s+/g, "-"),
+        slug: formData.slug,
         description: formData.description,
         content: formData.content,
         cover_image_url: formData.cover_image_url,
@@ -50,37 +56,23 @@ export default function AdminCreateEventPage() {
           router.push("/admin/events");
         }, 800);
       } else {
-        setErrorMessage(res.error || "Gagal menyimpan event");
+        setErrorMessage(res.error || "Gagal memperbarui event");
         setIsSubmitting(false);
       }
     } catch (err: any) {
-      setErrorMessage(err?.message || "Terjadi kesalahan pada server");
+      setErrorMessage(err.message || "Terjadi kesalahan saat menyimpan event");
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      <div className="flex items-center gap-4">
-        <Link
-          href="/admin/events"
-          className="p-2 rounded-xl bg-white border border-gray-200 text-gray-600 hover:text-charcoal hover:bg-gray-50 transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4" />
-        </Link>
-        <div>
-          <h2 className="font-heading text-2xl font-bold text-charcoal">
-            Tambah Event Baru
-          </h2>
-          <p className="text-gray-500 text-xs mt-0.5">
-            Dokumentasikan acara atau perhelatan yang telah terlaksana
-          </p>
-        </div>
-      </div>
-
+    <form
+      onSubmit={handleSubmit}
+      className="bg-white rounded-3xl p-6 sm:p-8 border border-gray-100 shadow-sm space-y-6"
+    >
       {isSaved && (
         <div className="p-4 rounded-xl bg-green-50 border border-green-200 text-green-700 text-sm font-semibold">
-          Data event baru berhasil disimpan! Mengalihkan...
+          Data event berhasil diperbarui! Mengalihkan ke halaman daftar event...
         </div>
       )}
 
@@ -90,22 +82,21 @@ export default function AdminCreateEventPage() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm space-y-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <div className="space-y-4">
+        <h3 className="font-heading text-lg font-bold text-charcoal border-b border-gray-100 pb-2">
+          Informasi Utama Acara
+        </h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
-              Judul Event *
+              Judul Acara *
             </label>
             <input
               type="text"
               required
               value={formData.title}
-              onChange={(e) => {
-                const title = e.target.value;
-                const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-                setFormData({ ...formData, title, slug });
-              }}
-              placeholder="Contoh: Royal Wedding Amanda & Kevin"
+              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-forest text-sm bg-gray-50"
             />
           </div>
@@ -122,22 +113,23 @@ export default function AdminCreateEventPage() {
               className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-forest text-sm bg-gray-50"
             />
           </div>
+        </div>
 
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
             <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
               Tipe Acara
             </label>
             <select
               value={formData.event_type}
-              onChange={(e) => setFormData({ ...formData, event_type: e.target.value })}
+              onChange={(e) => setFormData({ ...formData, event_type: e.target.value as any })}
               className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-forest text-sm bg-gray-50"
             >
-              <option value="wedding">Wedding</option>
-              <option value="meeting">Meeting</option>
-              <option value="outbound">Outbound</option>
-              <option value="graduation">Graduation</option>
-              <option value="corporate">Corporate</option>
-              <option value="other">Other</option>
+              {EVENT_TYPES.map((t) => (
+                <option key={t.value} value={t.value}>
+                  {t.label}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -182,14 +174,13 @@ export default function AdminCreateEventPage() {
 
         <div>
           <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
-            Ringkasan Deskripsi
+            Ringkasan Deskripsi *
           </label>
           <input
             type="text"
             required
             value={formData.description}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            placeholder="Keterangan singkat tentang tema dan suasana acara..."
             className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-forest text-sm bg-gray-50"
           />
         </div>
@@ -199,30 +190,53 @@ export default function AdminCreateEventPage() {
             Konten Cerita Acara Lengkap
           </label>
           <textarea
-            rows={5}
+            rows={6}
             value={formData.content}
             onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-            placeholder="Tuliskan testimoni atau detail jalannya acara..."
             className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-forest text-sm bg-gray-50"
           />
         </div>
 
-        <div className="pt-4 border-t border-gray-100 flex justify-end gap-3">
-          <Link
-            href="/admin/events"
-            className="px-6 py-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 font-semibold text-xs transition-colors"
+        <div>
+          <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
+            Status Publikasi
+          </label>
+          <select
+            value={formData.is_published ? "true" : "false"}
+            onChange={(e) => setFormData({ ...formData, is_published: e.target.value === "true" })}
+            className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-forest text-sm bg-gray-50 max-w-xs"
           >
-            Batal
-          </Link>
-          <button
-            type="submit"
-            className="px-6 py-2.5 rounded-xl bg-forest hover:bg-forest-dark text-white font-semibold text-xs transition-colors flex items-center gap-2"
-          >
-            <Save className="w-4 h-4" />
-            <span>Simpan Event</span>
-          </button>
+            <option value="true">Terpublikasi (Tampil)</option>
+            <option value="false">Draft / Sembunyi</option>
+          </select>
         </div>
-      </form>
-    </div>
+      </div>
+
+      <div className="pt-4 border-t border-gray-100 flex justify-end gap-3">
+        <Link
+          href="/admin/events"
+          className="px-6 py-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 font-semibold text-xs transition-colors"
+        >
+          Batal
+        </Link>
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="px-6 py-2.5 rounded-xl bg-forest hover:bg-forest-dark text-white font-semibold text-xs transition-colors flex items-center gap-2 shadow-sm"
+        >
+          {isSubmitting ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span>Menyimpan...</span>
+            </>
+          ) : (
+            <>
+              <Save className="w-4 h-4" />
+              <span>Simpan Perubahan</span>
+            </>
+          )}
+        </button>
+      </div>
+    </form>
   );
 }

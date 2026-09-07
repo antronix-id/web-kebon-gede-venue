@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
+import { createClient, createPublicClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { venueSchema, type VenueInput } from "@/lib/validations";
 import { venues as seedVenues } from "@/lib/seed-data";
 import type { Venue } from "@/types";
@@ -11,7 +11,7 @@ export async function getVenues(onlyActive = false): Promise<Venue[]> {
     return onlyActive ? seedVenues.filter((v) => v.is_active) : seedVenues;
   }
 
-  const supabase = await createClient();
+  const supabase = onlyActive ? createPublicClient() : await createClient();
   let query = supabase.from("venues").select("*, venue_images(*)").order("display_order", { ascending: true });
 
   if (onlyActive) {
@@ -20,7 +20,7 @@ export async function getVenues(onlyActive = false): Promise<Venue[]> {
 
   const { data, error } = await query;
   if (error || !data) {
-    console.error("Error fetching venues:", error);
+    console.error("Error fetching venues:", error?.message || error?.details || error);
     return onlyActive ? seedVenues.filter((v) => v.is_active) : seedVenues;
   }
 
@@ -38,7 +38,7 @@ export async function getVenueBySlug(slug: string): Promise<Venue | null> {
     return seedVenues.find((v) => v.slug === slug) || null;
   }
 
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data, error } = await supabase
     .from("venues")
     .select("*, venue_images(*)")

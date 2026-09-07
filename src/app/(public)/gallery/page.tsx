@@ -2,14 +2,17 @@ import type { Metadata } from "next";
 import SectionHeading from "@/components/public/section-heading";
 import GalleryGrid from "@/components/public/gallery-grid";
 import CTASection from "@/components/public/cta-section";
-import { galleryItems } from "@/lib/seed-data";
+import { galleryItems as seedGallery } from "@/lib/seed-data";
+import { getGalleryItems } from "@/actions/gallery";
 
 export const metadata: Metadata = {
   title: "Galeri Foto",
   description: "Dokumentasi visual berbagai event wedding, outbound, graduation, dan meeting di Kebon Gede Venue Palembang.",
 };
 
-export default function GalleryPage() {
+export default async function GalleryPage() {
+  const liveGallery = await getGalleryItems("all");
+  const items = liveGallery && liveGallery.length > 0 ? liveGallery : seedGallery;
   return (
     <div className="pt-24 pb-0">
       {/* Hero Banner */}
@@ -36,7 +39,7 @@ export default function GalleryPage() {
             description="Pilih kategori di bawah untuk menyaring dokumentasi kegiatan berdasarkan tipe acara."
           />
 
-          <GalleryGrid items={galleryItems} />
+          <GalleryGrid items={items} />
         </div>
       </section>
 

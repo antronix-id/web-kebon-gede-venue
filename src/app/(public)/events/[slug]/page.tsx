@@ -1,32 +1,54 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { Calendar, MapPin, Tag, ArrowLeft, Share2 } from "lucide-react";
-import { events, getEventBySlug, venues } from "@/lib/seed-data";
+import { events as seedEvents, getEventBySlug as getSeedEventBySlug, venues as seedVenues } from "@/lib/seed-data";
+import { getEventBySlug as getLiveEventBySlug } from "@/actions/events";
+import { getVenues } from "@/actions/venues";
 import { formatDate, getEventTypeBadge } from "@/lib/utils";
 import EventCard from "@/components/public/event-card";
+import { EventJsonLd } from "@/components/shared/seo";
 
 interface EventDetailPageProps {
   params: Promise<{ slug: string }>;
 }
 
 export async function generateStaticParams() {
-  return events.map((e) => ({ slug: e.slug }));
+  return seedEvents.map((e) => ({ slug: e.slug }));
+}
+
+export async function generateMetadata({ params }: EventDetailPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const event = (await getLiveEventBySlug(slug)) || getSeedEventBySlug(slug);
+  if (!event) return { title: "Event Tidak Ditemukan" };
+  return {
+    title: `${event.title} - Event di Kebon Gede Palembang`,
+    description: event.description,
+    openGraph: {
+      title: `${event.title} | Kebon Gede Venue`,
+      description: event.description,
+      images: event.cover_image_url ? [event.cover_image_url] : [],
+    },
+  };
 }
 
 export default async function EventDetailPage({ params }: EventDetailPageProps) {
   const { slug } = await params;
-  const event = getEventBySlug(slug);
+  const event = (await getLiveEventBySlug(slug)) || getSeedEventBySlug(slug);
 
   if (!event) {
     notFound();
   }
 
-  const venue = venues.find((v) => v.id === event.venue_id);
-  const otherEvents = events.filter((e) => e.id !== event.id).slice(0, 3);
+  const liveVenues = await getVenues(false);
+  const venuesList = liveVenues.length > 0 ? liveVenues : seedVenues;
+  const venue = venuesList.find((v) => v.id === event.venue_id);
+  const otherEvents = seedEvents.filter((e) => e.id !== event.id).slice(0, 3);
 
   return (
     <div className="pt-20 sm:pt-24 pb-14 sm:pb-20 bg-cream">
+      <EventJsonLd event={event} venue={venue} />
       {/* Back button */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
         <Link

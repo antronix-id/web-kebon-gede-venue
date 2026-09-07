@@ -24,7 +24,11 @@ import TestimonialCarousel from "@/components/public/testimonial-carousel";
 import FAQAccordion from "@/components/public/faq-accordion";
 import CTASection from "@/components/public/cta-section";
 import StatsCounter from "@/components/public/stats-counter";
-import { venues, galleryItems, faqs } from "@/lib/seed-data";
+import { venues as seedVenues, galleryItems as seedGallery, faqs as seedFaqs } from "@/lib/seed-data";
+import { getVenues } from "@/actions/venues";
+import { getGalleryItems } from "@/actions/gallery";
+import { getFaqs } from "@/actions/faq";
+import { OrganizationJsonLd, FAQJsonLd } from "@/components/shared/seo";
 
 const eventTypes = [
   { label: "Wedding & Resepsi", icon: Heart, desc: "Pernikahan impian indoor & outdoor" },
@@ -65,11 +69,32 @@ const advantages = [
   },
 ];
 
-export default function HomePage() {
-  const featuredGallery = galleryItems.slice(0, 8);
+export default async function HomePage() {
+  let displayVenues = seedVenues;
+  let displayGallery = seedGallery;
+  let displayFaqs = seedFaqs;
+
+  try {
+    const liveVenues = await getVenues(true);
+    if (liveVenues && liveVenues.length > 0) displayVenues = liveVenues;
+  } catch {}
+
+  try {
+    const liveGallery = await getGalleryItems("all");
+    if (liveGallery && liveGallery.length > 0) displayGallery = liveGallery;
+  } catch {}
+
+  try {
+    const liveFaqs = await getFaqs(true);
+    if (liveFaqs && liveFaqs.length > 0) displayFaqs = liveFaqs;
+  } catch {}
+
+  const featuredGallery = displayGallery.slice(0, 8);
 
   return (
     <div className="flex flex-col gap-0">
+      <OrganizationJsonLd />
+      <FAQJsonLd items={displayFaqs} />
       {/* Section 1: Hero Slider */}
       <HeroSlider />
 
@@ -132,7 +157,7 @@ export default function HomePage() {
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            {venues.map((venue, idx) => (
+            {displayVenues.map((venue, idx) => (
               <VenueCard key={venue.id} venue={venue} index={idx} />
             ))}
           </div>
@@ -273,7 +298,7 @@ export default function HomePage() {
             description="Jawaban seputar pemesanan, teknis fasilitas, dan kapasitas tempat di Kebon Gede Venue."
           />
 
-          <FAQAccordion items={faqs} />
+          <FAQAccordion items={displayFaqs} />
 
           <div className="mt-8 sm:mt-12 text-center p-5 sm:p-8 rounded-2xl bg-cream border border-gold/20">
             <p className="text-charcoal font-semibold text-sm sm:text-base mb-1.5 sm:mb-2">Punya pertanyaan lain yang belum terjawab?</p>

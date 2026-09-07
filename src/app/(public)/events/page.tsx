@@ -2,14 +2,17 @@ import type { Metadata } from "next";
 import SectionHeading from "@/components/public/section-heading";
 import EventCard from "@/components/public/event-card";
 import CTASection from "@/components/public/cta-section";
-import { events } from "@/lib/seed-data";
+import { events as seedEvents } from "@/lib/seed-data";
+import { getEvents } from "@/actions/events";
 
 export const metadata: Metadata = {
   title: "Agenda & Portofolio Event",
   description: "Daftar perhelatan wedding, gathering, seminar, dan festival yang diselenggarakan di Kebon Gede Venue.",
 };
 
-export default function EventsPage() {
+export default async function EventsPage() {
+  const liveEvents = await getEvents(true);
+  const eventsList = liveEvents && liveEvents.length > 0 ? liveEvents : seedEvents;
   return (
     <div className="pt-16 sm:pt-20">
       {/* Hero Banner */}
@@ -37,7 +40,7 @@ export default function EventsPage() {
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            {events.map((evt, idx) => (
+            {eventsList.map((evt, idx) => (
               <EventCard key={evt.id} event={evt} index={idx} />
             ))}
           </div>

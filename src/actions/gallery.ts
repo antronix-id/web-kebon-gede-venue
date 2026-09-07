@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
+import { createClient, createPublicClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { galleryItemSchema, type GalleryItemInput } from "@/lib/validations";
 import { galleryItems as seedGallery } from "@/lib/seed-data";
 import type { GalleryItem, GalleryCategory } from "@/types";
@@ -12,7 +12,7 @@ export async function getGalleryItems(category?: GalleryCategory | "all"): Promi
     return seedGallery.filter((item) => item.category === category);
   }
 
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   let query = supabase.from("gallery_items").select("*").order("display_order", { ascending: true });
 
   if (category && category !== "all") {
@@ -21,7 +21,7 @@ export async function getGalleryItems(category?: GalleryCategory | "all"): Promi
 
   const { data, error } = await query;
   if (error || !data) {
-    console.error("Error fetching gallery items:", error);
+    console.error("Error fetching gallery items:", error?.message || error?.details || error);
     if (!category || category === "all") return seedGallery;
     return seedGallery.filter((item) => item.category === category);
   }
@@ -129,3 +129,8 @@ export async function deleteGalleryItemsBulk(ids: string[]) {
   revalidatePath("/");
   return { success: true };
 }
+
+export async function toggleGalleryFeatured(id: string, isFeatured: boolean) {
+  return updateGalleryItem(id, { is_featured: isFeatured });
+}
+

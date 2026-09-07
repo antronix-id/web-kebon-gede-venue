@@ -1,13 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
-import { Save, CheckCircle2, Globe, Phone, Share2, Search, Palette } from "lucide-react";
+import { Save, CheckCircle2, Globe, Phone, Share2, Search, Palette, Loader2 } from "lucide-react";
 import { siteSettings as initialSettings } from "@/lib/seed-data";
+import { getSettings, updateMultipleSettings } from "@/actions/settings";
+import { ImageUpload } from "@/components/admin/image-upload";
+import { STORAGE_BUCKETS } from "@/lib/constants";
 
 export default function AdminSettingsPage() {
   const [activeTab, setActiveTab] = useState<"general" | "contact" | "social" | "seo" | "branding">("general");
   const [isSaved, setIsSaved] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const [settings, setSettings] = useState({
     site_name: "Kebon Gede Venue",
@@ -24,12 +28,42 @@ export default function AdminSettingsPage() {
     youtube: "https://youtube.com/@kebongedevenue",
     seo_title: "Kebon Gede Venue - Best Venue for Your Event di Palembang",
     seo_description: "Venue Outdoor & Indoor terbaik di Palembang untuk Wedding, Meeting, Outbound, Graduation.",
+    logo_url: "/images/logo.png",
   });
 
-  const handleSave = (e: React.FormEvent) => {
+  useEffect(() => {
+    async function loadSettings() {
+      try {
+        const live = await getSettings();
+        if (live && live.length > 0) {
+          const map: Record<string, string> = {};
+          live.forEach((item) => {
+            map[item.key] = item.value;
+          });
+          setSettings((prev) => ({
+            ...prev,
+            ...map,
+          }));
+        }
+      } catch (err) {
+        console.error("Error loading settings:", err);
+      }
+    }
+    loadSettings();
+  }, []);
+
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSaved(true);
-    setTimeout(() => setIsSaved(false), 3000);
+    setIsSaving(true);
+    try {
+      await updateMultipleSettings(settings);
+      setIsSaved(true);
+      setTimeout(() => setIsSaved(false), 3000);
+    } catch (err) {
+      console.error("Failed to save settings:", err);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -263,35 +297,35 @@ export default function AdminSettingsPage() {
         )}
 
         {activeTab === "branding" && (
-          <div className="space-y-6">
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-3">
-                Logo Website Saat Ini
-              </label>
-              <div className="flex items-center gap-6 p-4 rounded-2xl bg-gray-50 border border-gray-200 w-fit">
-                <Image
-                  src="/images/logo.png"
-                  alt="Current Logo"
-                  width={64}
-                  height={64}
-                  className="rounded-xl shadow-sm"
-                />
-                <div>
-                  <p className="font-semibold text-sm text-charcoal">logo.png</p>
-                  <p className="text-xs text-gray-400">Monogram KG Hijau Daun</p>
-                </div>
-              </div>
-            </div>
+          <div className="space-y-6 max-w-md">
+            <ImageUpload
+              label="Logo Website & Branding"
+              value={settings.logo_url}
+              onChange={(url) => setSettings({ ...settings, logo_url: url })}
+              bucket={STORAGE_BUCKETS.GENERAL}
+              aspectRatio="square"
+              helperText="Format: PNG, SVG, atau WEBP dengan latar transparan (maks. 2MB)"
+            />
           </div>
         )}
 
         <div className="pt-4 border-t border-gray-100 flex justify-end">
           <button
             type="submit"
-            className="px-6 py-2.5 rounded-xl bg-forest hover:bg-forest-dark text-white font-semibold text-xs transition-colors flex items-center gap-2"
+            disabled={isSaving}
+            className="px-6 py-2.5 rounded-xl bg-forest hover:bg-forest-dark text-white font-semibold text-xs transition-colors flex items-center gap-2 disabled:opacity-50"
           >
-            <Save className="w-4 h-4" />
-            <span>Simpan Semua Perubahan</span>
+            {isSaving ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>Menyimpan...</span>
+              </>
+            ) : (
+              <>
+                <Save className="w-4 h-4" />
+                <span>Simpan Semua Perubahan</span>
+              </>
+            )}
           </button>
         </div>
       </form>

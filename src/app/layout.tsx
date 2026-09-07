@@ -22,6 +22,7 @@ const cormorant = Cormorant_Garamond({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://kebongede.com"),
   title: {
     default: "Kebon Gede Venue - Best Venue for Your Event di Palembang",
     template: "%s | Kebon Gede Venue",

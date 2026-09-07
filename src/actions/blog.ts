@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
+import { createClient, createPublicClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { blogPostSchema, type BlogPostInput } from "@/lib/validations";
 import { blogPosts as seedBlogs } from "@/lib/seed-data";
 import type { BlogPost } from "@/types";
@@ -15,7 +15,8 @@ export async function getBlogPosts(statusFilter?: "published" | "draft" | "archi
     return seedBlogs.filter((b) => b.status === statusFilter);
   }
 
-  const supabase = await createClient();
+  const isPublic = !statusFilter || statusFilter === "published";
+  const supabase = isPublic ? createPublicClient() : await createClient();
   let query = supabase.from("blog_posts").select("*").order("created_at", { ascending: false });
 
   if (statusFilter && statusFilter !== "all") {
@@ -26,7 +27,7 @@ export async function getBlogPosts(statusFilter?: "published" | "draft" | "archi
 
   const { data, error } = await query;
   if (error || !data) {
-    console.error("Error fetching blog posts:", error);
+    console.error("Error fetching blog posts:", error?.message || error?.details || error);
     return seedBlogs.filter((b) => b.status === "published");
   }
 
@@ -38,7 +39,7 @@ export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> 
     return seedBlogs.find((b) => b.slug === slug) || null;
   }
 
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data, error } = await supabase.from("blog_posts").select("*").eq("slug", slug).single();
   if (error || !data) {
     return seedBlogs.find((b) => b.slug === slug) || null;

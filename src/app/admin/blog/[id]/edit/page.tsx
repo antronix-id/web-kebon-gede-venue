@@ -1,23 +1,23 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { venues } from "@/lib/seed-data";
-import { getVenueById } from "@/actions/venues";
-import AdminEditVenueForm from "./form";
+import { blogPosts as seedPosts } from "@/lib/seed-data";
+import { getBlogPostById } from "@/actions/blog";
+import AdminEditBlogForm from "./form";
 
-interface EditVenuePageProps {
+interface EditBlogPageProps {
   params: Promise<{ id: string }>;
 }
 
 export async function generateStaticParams() {
-  return venues.map((v) => ({ id: v.id }));
+  return seedPosts.map((p) => ({ id: p.id }));
 }
 
-export default async function AdminEditVenuePage({ params }: EditVenuePageProps) {
+export default async function AdminEditBlogPage({ params }: EditBlogPageProps) {
   const { id } = await params;
-  const venue = (await getVenueById(id)) || venues.find((v) => v.id === id);
+  const post = (await getBlogPostById(id)) || seedPosts.find((p) => p.id === id);
 
-  if (!venue) {
+  if (!post) {
     notFound();
   }
 
@@ -25,22 +25,22 @@ export default async function AdminEditVenuePage({ params }: EditVenuePageProps)
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="flex items-center gap-4">
         <Link
-          href="/admin/venues"
+          href="/admin/blog"
           className="p-2 rounded-xl bg-white border border-gray-200 text-gray-600 hover:text-charcoal hover:bg-gray-50 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
         </Link>
         <div>
           <h2 className="font-heading text-2xl font-bold text-charcoal">
-            Edit Venue: {venue.name}
+            Edit Artikel: {post.title}
           </h2>
           <p className="text-gray-500 text-xs mt-0.5">
-            Perbarui informasi kapasitas, fasilitas, dan deskripsi venue
+            Perbarui naskah artikel, cover blog, status publikasi, dan kategori tags
           </p>
         </div>
       </div>
 
-      <AdminEditVenueForm venue={venue} />
+      <AdminEditBlogForm post={post} />
     </div>
   );
 }

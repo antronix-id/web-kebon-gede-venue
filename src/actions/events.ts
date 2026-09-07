@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
+import { createClient, createPublicClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { eventSchema, type EventInput } from "@/lib/validations";
 import { events as seedEvents } from "@/lib/seed-data";
 import type { EventItem } from "@/types";
@@ -11,7 +11,7 @@ export async function getEvents(onlyPublished = false): Promise<EventItem[]> {
     return onlyPublished ? seedEvents.filter((e) => e.is_published) : seedEvents;
   }
 
-  const supabase = await createClient();
+  const supabase = onlyPublished ? createPublicClient() : await createClient();
   let query = supabase
     .from("events")
     .select("*, venues(name)")
@@ -23,7 +23,7 @@ export async function getEvents(onlyPublished = false): Promise<EventItem[]> {
 
   const { data, error } = await query;
   if (error || !data) {
-    console.error("Error fetching events:", error);
+    console.error("Error fetching events:", error?.message || error?.details || error);
     return onlyPublished ? seedEvents.filter((e) => e.is_published) : seedEvents;
   }
 
@@ -42,7 +42,7 @@ export async function getEventBySlug(slug: string): Promise<EventItem | null> {
     return seedEvents.find((e) => e.slug === slug) || null;
   }
 
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data, error } = await supabase
     .from("events")
     .select("*, venues(name)")

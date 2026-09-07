@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
+import { createClient, createPublicClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { siteSettings as seedSettings } from "@/lib/seed-data";
 import type { SiteSetting } from "@/types";
 
@@ -10,7 +10,7 @@ export async function getSettings(): Promise<SiteSetting[]> {
     return seedSettings;
   }
 
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data, error } = await supabase.from("site_settings").select("*");
 
   if (error || !data || data.length === 0) {
@@ -26,7 +26,7 @@ export async function getSettingByKey(key: string): Promise<string> {
     return found ? found.value : "";
   }
 
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data, error } = await supabase
     .from("site_settings")
     .select("value")

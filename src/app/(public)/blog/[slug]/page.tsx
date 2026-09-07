@@ -1,31 +1,50 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { Calendar, User, ArrowLeft, Tag } from "lucide-react";
-import { blogPosts, getBlogBySlug } from "@/lib/seed-data";
+import { blogPosts as seedPosts, getBlogBySlug as getSeedBlogBySlug } from "@/lib/seed-data";
+import { getBlogPostBySlug as getLiveBlogPostBySlug } from "@/actions/blog";
 import { formatDate } from "@/lib/utils";
 import BlogCard from "@/components/public/blog-card";
+import { BlogPostJsonLd } from "@/components/shared/seo";
 
 interface BlogPostPageProps {
   params: Promise<{ slug: string }>;
 }
 
 export async function generateStaticParams() {
-  return blogPosts.map((p) => ({ slug: p.slug }));
+  return seedPosts.map((p) => ({ slug: p.slug }));
+}
+
+export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const post = (await getLiveBlogPostBySlug(slug)) || getSeedBlogBySlug(slug);
+  if (!post) return { title: "Artikel Tidak Ditemukan" };
+  return {
+    title: `${post.title} - Blog Kebon Gede Palembang`,
+    description: post.excerpt,
+    openGraph: {
+      title: `${post.title} | Kebon Gede Venue`,
+      description: post.excerpt,
+      images: post.cover_image_url ? [post.cover_image_url] : [],
+    },
+  };
 }
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const { slug } = await params;
-  const post = getBlogBySlug(slug);
+  const post = (await getLiveBlogPostBySlug(slug)) || getSeedBlogBySlug(slug);
 
   if (!post) {
     notFound();
   }
 
-  const relatedPosts = blogPosts.filter((p) => p.id !== post.id).slice(0, 3);
+  const relatedPosts = seedPosts.filter((p) => p.id !== post.id).slice(0, 3);
 
   return (
     <div className="pt-20 sm:pt-24 pb-14 sm:pb-20 bg-cream">
+      <BlogPostJsonLd post={post} />
       {/* Back button */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
         <Link

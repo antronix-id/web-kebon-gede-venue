@@ -2,15 +2,17 @@ import type { Metadata } from "next";
 import SectionHeading from "@/components/public/section-heading";
 import BlogCard from "@/components/public/blog-card";
 import CTASection from "@/components/public/cta-section";
-import { blogPosts } from "@/lib/seed-data";
+import { blogPosts as seedPosts } from "@/lib/seed-data";
+import { getBlogPosts } from "@/actions/blog";
 
 export const metadata: Metadata = {
   title: "Artikel & Tips Seputar Event",
   description: "Dapatkan tips persiapan pernikahan, panduan memilih venue outdoor di Palembang, serta inspirasi event gathering dari Kebon Gede Venue.",
 };
 
-export default function BlogPage() {
-  const publishedPosts = blogPosts.filter((p) => p.status === "published");
+export default async function BlogPage() {
+  const livePosts = await getBlogPosts("published");
+  const publishedPosts = livePosts && livePosts.length > 0 ? livePosts : seedPosts.filter((p) => p.status === "published");
 
   return (
     <div className="pt-16 sm:pt-20">

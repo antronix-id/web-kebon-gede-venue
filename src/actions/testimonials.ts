@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
+import { createClient, createPublicClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { testimonialSchema, type TestimonialInput } from "@/lib/validations";
 import { testimonials as seedTestimonials } from "@/lib/seed-data";
 import type { Testimonial } from "@/types";
@@ -11,7 +11,7 @@ export async function getTestimonials(onlyApproved = true): Promise<Testimonial[
     return onlyApproved ? seedTestimonials.filter((t) => t.is_approved) : seedTestimonials;
   }
 
-  const supabase = await createClient();
+  const supabase = onlyApproved ? createPublicClient() : await createClient();
   let query = supabase.from("testimonials").select("*").order("created_at", { ascending: false });
 
   if (onlyApproved) {
@@ -20,7 +20,7 @@ export async function getTestimonials(onlyApproved = true): Promise<Testimonial[
 
   const { data, error } = await query;
   if (error || !data) {
-    console.error("Error fetching testimonials:", error);
+    console.error("Error fetching testimonials:", error?.message || error?.details || error);
     return onlyApproved ? seedTestimonials.filter((t) => t.is_approved) : seedTestimonials;
   }
 
@@ -53,6 +53,25 @@ export async function createTestimonial(input: TestimonialInput) {
   }
 
   return { success: true, data: { id: "testi-" + Date.now(), ...data } };
+}
+
+export async function updateTestimonial(id: string, input: Partial<TestimonialInput>) {
+  if (isSupabaseConfigured()) {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("testimonials")
+      .update(input)
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) return { success: false, error: error.message };
+    revalidatePath("/");
+    revalidatePath("/admin/testimonials");
+    return { success: true, data };
+  }
+
+  return { success: true, data: { id, ...input } };
 }
 
 export async function updateTestimonialStatus(id: string, isApproved: boolean) {

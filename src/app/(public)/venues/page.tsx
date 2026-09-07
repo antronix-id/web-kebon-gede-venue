@@ -2,14 +2,17 @@ import type { Metadata } from "next";
 import SectionHeading from "@/components/public/section-heading";
 import VenueCard from "@/components/public/venue-card";
 import CTASection from "@/components/public/cta-section";
-import { venues } from "@/lib/seed-data";
+import { venues as seedVenues } from "@/lib/seed-data";
+import { getVenues } from "@/actions/venues";
 
 export const metadata: Metadata = {
   title: "Pilihan Venue",
   description: "Jelajahi pilihan venue indoor, outdoor, dan semi-outdoor di Kebon Gede Venue Palembang. Kapasitas hingga 2.000+ tamu.",
 };
 
-export default function VenuesPage() {
+export default async function VenuesPage() {
+  const liveVenues = await getVenues(true);
+  const venuesList = liveVenues && liveVenues.length > 0 ? liveVenues : seedVenues;
   return (
     <div className="pt-16 sm:pt-20">
       {/* Hero Banner */}
@@ -37,7 +40,7 @@ export default function VenuesPage() {
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            {venues.map((venue, idx) => (
+            {venuesList.map((venue, idx) => (
               <VenueCard key={venue.id} venue={venue} index={idx} />
             ))}
           </div>

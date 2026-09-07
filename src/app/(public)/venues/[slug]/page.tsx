@@ -1,8 +1,10 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { Users, CheckCircle2, MapPin, Calendar, ArrowRight, ArrowLeft } from "lucide-react";
-import { getVenueBySlug, venues, events } from "@/lib/seed-data";
+import { getVenueBySlug as getSeedVenueBySlug, venues, events } from "@/lib/seed-data";
+import { getVenueBySlug as getLiveVenueBySlug } from "@/actions/venues";
 import { getVenueTypeBadge, formatNumber } from "@/lib/utils";
 import EventCard from "@/components/public/event-card";
 
@@ -14,9 +16,24 @@ export async function generateStaticParams() {
   return venues.map((v) => ({ slug: v.slug }));
 }
 
+export async function generateMetadata({ params }: VenueDetailPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const venue = (await getLiveVenueBySlug(slug)) || getSeedVenueBySlug(slug);
+  if (!venue) return { title: "Venue Tidak Ditemukan" };
+  return {
+    title: `${venue.name} - Venue di Kebon Gede Palembang`,
+    description: venue.short_description || venue.full_description?.slice(0, 160),
+    openGraph: {
+      title: `${venue.name} | Kebon Gede Venue`,
+      description: venue.short_description,
+      images: venue.hero_image_url ? [venue.hero_image_url] : [],
+    },
+  };
+}
+
 export default async function VenueDetailPage({ params }: VenueDetailPageProps) {
   const { slug } = await params;
-  const venue = getVenueBySlug(slug);
+  const venue = (await getLiveVenueBySlug(slug)) || getSeedVenueBySlug(slug);
 
   if (!venue) {
     notFound();

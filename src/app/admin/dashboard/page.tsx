@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   MessageSquare,
@@ -15,16 +16,48 @@ import {
 import StatCard from "@/components/admin/stat-card";
 import StatusBadge from "@/components/admin/status-badge";
 import {
-  contactMessages,
-  events,
-  blogPosts,
-  galleryItems,
+  contactMessages as seedMessages,
+  events as seedEvents,
+  blogPosts as seedPosts,
+  galleryItems as seedGallery,
 } from "@/lib/seed-data";
+import { getContactMessages } from "@/actions/contact";
+import { getEvents } from "@/actions/events";
+import { getBlogPosts } from "@/actions/blog";
+import { getGalleryItems } from "@/actions/gallery";
 import { formatDate } from "@/lib/utils";
+import type { ContactMessage } from "@/types";
 
 export default function AdminDashboardPage() {
-  const newMessagesCount = contactMessages.filter((m) => m.status === "new").length;
-  const recentMessages = contactMessages.slice(0, 5);
+  const [messages, setMessages] = useState<ContactMessage[]>(seedMessages);
+  const [eventCount, setEventCount] = useState(seedEvents.length);
+  const [postCount, setPostCount] = useState(seedPosts.length);
+  const [galleryCount, setGalleryCount] = useState(seedGallery.length);
+
+  useEffect(() => {
+    async function loadDashboardData() {
+      try {
+        const [liveMsgs, liveEvents, livePosts, liveGallery] = await Promise.all([
+          getContactMessages().catch(() => null),
+          getEvents(false).catch(() => null),
+          getBlogPosts().catch(() => null),
+          getGalleryItems("all").catch(() => null),
+        ]);
+
+        if (liveMsgs && liveMsgs.length > 0) setMessages(liveMsgs);
+        if (liveEvents && liveEvents.length > 0) setEventCount(liveEvents.length);
+        if (livePosts && livePosts.length > 0) setPostCount(livePosts.length);
+        if (liveGallery && liveGallery.length > 0) setGalleryCount(liveGallery.length);
+      } catch (err) {
+        console.error("Error loading dashboard data:", err);
+      }
+    }
+
+    loadDashboardData();
+  }, []);
+
+  const newMessagesCount = messages.filter((m) => m.status === "new").length;
+  const recentMessages = messages.slice(0, 5);
 
   return (
     <div className="space-y-8">
@@ -72,29 +105,29 @@ export default function AdminDashboardPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         <StatCard
           title="Pesan Masuk"
-          value={contactMessages.length}
+          value={messages.length}
           icon={MessageSquare}
           badge={`${newMessagesCount} Baru`}
-          change="+3 pesan minggu ini"
+          change={`${newMessagesCount} pesan perlu direspon`}
           isPositive
         />
         <StatCard
           title="Total Event"
-          value={events.length}
+          value={eventCount}
           icon={Calendar}
           change="Terselenggara aktif"
           isPositive
         />
         <StatCard
           title="Artikel Blog"
-          value={blogPosts.length}
+          value={postCount}
           icon={FileText}
-          change="3 Terpublikasi"
+          change="Artikel terpublikasi"
           isPositive
         />
         <StatCard
           title="Item Galeri"
-          value={galleryItems.length}
+          value={galleryCount}
           icon={ImageIcon}
           change="Kategori lengkap"
           isPositive

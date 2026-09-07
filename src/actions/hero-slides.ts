@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
+import { createClient, createPublicClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { heroSlideSchema, type HeroSlideInput } from "@/lib/validations";
 import { heroSlides as seedHero } from "@/lib/seed-data";
 import type { HeroSlide } from "@/types";
@@ -11,7 +11,7 @@ export async function getHeroSlides(onlyActive = true): Promise<HeroSlide[]> {
     return onlyActive ? seedHero.filter((s) => s.is_active) : seedHero;
   }
 
-  const supabase = await createClient();
+  const supabase = onlyActive ? createPublicClient() : await createClient();
   let query = supabase.from("hero_slides").select("*").order("display_order", { ascending: true });
 
   if (onlyActive) {
@@ -20,7 +20,7 @@ export async function getHeroSlides(onlyActive = true): Promise<HeroSlide[]> {
 
   const { data, error } = await query;
   if (error || !data) {
-    console.error("Error fetching hero slides:", error);
+    console.error("Error fetching hero slides:", error?.message || error?.details || error);
     return onlyActive ? seedHero.filter((s) => s.is_active) : seedHero;
   }
 

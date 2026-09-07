@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
+import { createClient, createPublicClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { faqSchema, type FAQInput } from "@/lib/validations";
 import { faqs as seedFaqs } from "@/lib/seed-data";
 import type { FAQ } from "@/types";
@@ -11,7 +11,7 @@ export async function getFaqs(onlyActive = true): Promise<FAQ[]> {
     return onlyActive ? seedFaqs.filter((f) => f.is_active) : seedFaqs;
   }
 
-  const supabase = await createClient();
+  const supabase = onlyActive ? createPublicClient() : await createClient();
   let query = supabase.from("faqs").select("*").order("display_order", { ascending: true });
 
   if (onlyActive) {
@@ -20,7 +20,7 @@ export async function getFaqs(onlyActive = true): Promise<FAQ[]> {
 
   const { data, error } = await query;
   if (error || !data) {
-    console.error("Error fetching FAQs:", error);
+    console.error("Error fetching FAQs:", error?.message || error?.details || error);
     return onlyActive ? seedFaqs.filter((f) => f.is_active) : seedFaqs;
   }
 
