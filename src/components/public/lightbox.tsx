@@ -48,26 +48,26 @@ export default function Lightbox({ images, currentIndex, onClose, onPrev, onNext
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-10 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors"
+          className="absolute top-3 right-3 sm:top-4 sm:right-4 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center text-white transition-colors"
           aria-label="Close lightbox"
         >
-          <X className="w-6 h-6" />
+          <X className="w-5 h-5 sm:w-6 sm:h-6" />
         </button>
 
         {/* Navigation */}
         <button
           onClick={(e) => { e.stopPropagation(); onPrev(); }}
-          className="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors"
+          className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-20 w-9 h-9 sm:w-12 sm:h-12 rounded-full bg-white/15 hover:bg-white/25 backdrop-blur-sm flex items-center justify-center text-white transition-colors"
           aria-label="Previous image"
         >
-          <ChevronLeft className="w-6 h-6" />
+          <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
         </button>
         <button
           onClick={(e) => { e.stopPropagation(); onNext(); }}
-          className="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors"
+          className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-20 w-9 h-9 sm:w-12 sm:h-12 rounded-full bg-white/15 hover:bg-white/25 backdrop-blur-sm flex items-center justify-center text-white transition-colors"
           aria-label="Next image"
         >
-          <ChevronRight className="w-6 h-6" />
+          <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
         </button>
 
         {/* Image */}
@@ -77,20 +77,22 @@ export default function Lightbox({ images, currentIndex, onClose, onPrev, onNext
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
           transition={{ duration: 0.3 }}
-          className="relative max-w-5xl max-h-[85vh] w-full mx-4"
+          className="relative max-w-5xl max-h-[85vh] w-full px-4 sm:px-12"
           onClick={(e) => e.stopPropagation()}
         >
-          <Image
-            src={current.src}
-            alt={current.alt}
-            width={1200}
-            height={800}
-            className="w-full h-auto max-h-[80vh] object-contain rounded-lg"
-          />
+          <div className="relative w-full flex justify-center items-center">
+            <Image
+              src={current.src}
+              alt={current.alt}
+              width={1200}
+              height={800}
+              className="w-auto h-auto max-w-full max-h-[70vh] sm:max-h-[78vh] object-contain rounded-xl shadow-2xl"
+            />
+          </div>
           {current.caption && (
-            <p className="text-white/70 text-center text-sm mt-4">{current.caption}</p>
+            <p className="text-white/85 text-center text-xs sm:text-sm mt-3 px-2 line-clamp-2">{current.caption}</p>
           )}
-          <p className="text-white/40 text-center text-xs mt-2">
+          <p className="text-white/50 text-center text-[11px] sm:text-xs mt-1.5 font-mono">
             {currentIndex + 1} / {images.length}
           </p>
         </motion.div>

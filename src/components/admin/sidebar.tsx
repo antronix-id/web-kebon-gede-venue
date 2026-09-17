@@ -92,12 +92,12 @@ export default function AdminSidebar({ isOpen = false, onClose }: AdminSidebarPr
       )}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-charcoal text-white flex flex-col shrink-0 h-screen border-r border-white/10 transition-transform duration-300 ease-in-out lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-sidebar text-sidebar-foreground flex flex-col shrink-0 h-screen border-r border-sidebar-border transition-transform duration-300 ease-in-out lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         {/* Brand Logo & Close Button */}
-        <div className="p-5 sm:p-6 border-b border-white/10 flex items-center justify-between">
+        <div className="p-5 sm:p-6 border-b border-sidebar-border flex items-center justify-between">
           <Link href="/admin/dashboard" onClick={onClose} className="flex items-center gap-3">
             <Image
               src="/images/logo.png"
@@ -107,17 +107,17 @@ export default function AdminSidebar({ isOpen = false, onClose }: AdminSidebarPr
               className="h-9 w-auto object-contain"
             />
             <div>
-              <span className="font-serif text-lg font-bold tracking-wide text-white block">
+              <span className="font-serif text-lg font-bold tracking-wide text-sidebar-foreground block">
                 KEBON GEDE
               </span>
-              <span className="text-[10px] uppercase tracking-widest text-gold block font-sans">
+              <span className="text-[10px] uppercase tracking-widest text-sidebar-primary font-semibold block font-sans">
                 Admin Panel
               </span>
             </div>
           </Link>
           <button
             onClick={onClose}
-            className="p-1.5 text-gray-400 hover:text-white rounded-lg lg:hidden"
+            className="p-1.5 text-sidebar-foreground/60 hover:text-sidebar-foreground rounded-lg lg:hidden"
             aria-label="Tutup Menu"
           >
             <X className="w-5 h-5" />
@@ -138,11 +138,11 @@ export default function AdminSidebar({ isOpen = false, onClose }: AdminSidebarPr
                 onClick={onClose}
                 className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
                   isActive
-                    ? "bg-forest text-white shadow-md shadow-forest/30"
-                    : "text-gray-300 hover:text-white hover:bg-white/5"
+                    ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-md shadow-sidebar-primary/25"
+                    : "text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-sidebar-accent/50"
                 }`}
               >
-                <Icon className={`w-4 h-4 ${isActive ? "text-gold" : "text-gray-400"}`} />
+                <Icon className={`w-4 h-4 ${isActive ? "text-sidebar-primary-foreground" : "text-sidebar-foreground/60"}`} />
                 <span className="flex-1 truncate">{item.label}</span>
               </Link>
             );

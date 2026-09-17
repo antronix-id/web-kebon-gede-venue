@@ -24,10 +24,11 @@ import TestimonialCarousel from "@/components/public/testimonial-carousel";
 import FAQAccordion from "@/components/public/faq-accordion";
 import CTASection from "@/components/public/cta-section";
 import StatsCounter from "@/components/public/stats-counter";
-import { venues as seedVenues, galleryItems as seedGallery, faqs as seedFaqs } from "@/lib/seed-data";
+import { venues as seedVenues, galleryItems as seedGallery, faqs as seedFaqs, heroSlides as seedHeroSlides } from "@/lib/seed-data";
 import { getVenues } from "@/actions/venues";
 import { getGalleryItems } from "@/actions/gallery";
 import { getFaqs } from "@/actions/faq";
+import { getHeroSlides } from "@/actions/hero-slides";
 import { OrganizationJsonLd, FAQJsonLd } from "@/components/shared/seo";
 
 const eventTypes = [
@@ -70,9 +71,15 @@ const advantages = [
 ];
 
 export default async function HomePage() {
+  let displayHeroSlides = seedHeroSlides;
   let displayVenues = seedVenues;
   let displayGallery = seedGallery;
   let displayFaqs = seedFaqs;
+
+  try {
+    const liveHeroSlides = await getHeroSlides(true);
+    if (liveHeroSlides && liveHeroSlides.length > 0) displayHeroSlides = liveHeroSlides;
+  } catch {}
 
   try {
     const liveVenues = await getVenues(true);
@@ -96,15 +103,15 @@ export default async function HomePage() {
       <OrganizationJsonLd />
       <FAQJsonLd items={displayFaqs} />
       {/* Section 1: Hero Slider */}
-      <HeroSlider />
+      <HeroSlider slides={displayHeroSlides} />
 
       {/* Section 2: Tentang Singkat */}
-      <section className="py-14 sm:py-20 lg:py-24 bg-cream">
+      <section className="py-12 sm:py-16 lg:py-24 bg-background border-b border-border/60">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
             {/* Image */}
             <div className="relative group">
-              <div className="relative h-[280px] sm:h-[400px] lg:h-[480px] rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl sm:shadow-2xl border-2 sm:border-4 border-white">
+              <div className="relative h-[280px] sm:h-[400px] lg:h-[480px] rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl sm:shadow-2xl border-2 sm:border-4 border-card">
                 <Image
                   src="/images/20.png"
                   alt="Gerbang Kebon Gede Venue Palembang"
@@ -113,30 +120,30 @@ export default async function HomePage() {
                   sizes="(max-width: 1024px) 100vw, 50vw"
                 />
               </div>
-              <div className="absolute -bottom-4 -right-4 sm:-bottom-6 sm:-right-6 bg-forest text-white p-4 sm:p-6 rounded-xl sm:rounded-2xl shadow-xl hidden sm:block border-2 border-gold/30">
-                <p className="font-heading text-2xl sm:text-3xl font-bold text-gold-light">1 Hektar</p>
-                <p className="text-[10px] sm:text-xs uppercase tracking-wider font-accent">Ruang Terbuka Hijau</p>
+              <div className="absolute -bottom-4 -right-4 sm:-bottom-6 sm:-right-6 bg-card text-card-foreground p-4 sm:p-6 rounded-xl sm:rounded-2xl shadow-xl hidden sm:block border-2 border-primary/30">
+                <p className="font-heading text-2xl sm:text-3xl font-bold text-primary">1 Hektar</p>
+                <p className="text-[10px] sm:text-xs uppercase tracking-wider text-muted-foreground font-sans font-medium">Ruang Terbuka Hijau</p>
               </div>
             </div>
 
             {/* Content */}
             <div className="space-y-4 sm:space-y-6">
-              <span className="inline-block px-3.5 py-1 sm:px-4 sm:py-1.5 rounded-full bg-forest/10 text-forest text-xs font-semibold tracking-wider uppercase">
+              <span className="inline-block px-3.5 py-1 sm:px-4 sm:py-1.5 rounded-full bg-primary/10 text-primary border border-primary/20 text-xs font-semibold tracking-wider uppercase">
                 Selamat Datang
               </span>
-              <h2 className="font-heading text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-charcoal leading-tight">
+              <h2 className="font-heading text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground leading-tight">
                 Keindahan Alam & Kemewahan di Jantung Kota Palembang
               </h2>
-              <p className="text-gray-600 text-sm sm:text-base md:text-lg leading-relaxed">
+              <p className="text-muted-foreground text-sm sm:text-base md:text-lg leading-relaxed">
                 Kebon Gede Venue hadir sebagai solusi venue pilihan terbaik di Palembang. Menghadirkan perpaduan harmonis antara pesona alam hijau nan asri dengan kenyamanan fasilitas modern premium.
               </p>
-              <p className="text-gray-600 text-xs sm:text-sm md:text-base leading-relaxed">
+              <p className="text-muted-foreground text-xs sm:text-sm md:text-base leading-relaxed">
                 Mulai dari pesta pernikahan sakral bertabur bunga, gathering korporat berskala besar, outbound yang penuh semangat kebersamaan, hingga wisuda penuh rasa bangga — semua kami rancang untuk menciptakan kenangan abadi tak terlupakan.
               </p>
               <div className="pt-2 sm:pt-4">
                 <Link
                   href="/about"
-                  className="inline-flex items-center gap-2.5 px-6 py-3 sm:px-8 sm:py-4 rounded-xl bg-forest hover:bg-forest-dark text-white font-semibold text-xs sm:text-sm transition-all shadow-md hover:shadow-xl group"
+                  className="inline-flex items-center gap-2.5 px-6 py-3 sm:px-8 sm:py-4 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-xs sm:text-sm transition-all shadow-md hover:shadow-xl group"
                 >
                   <span>Selengkapnya Tentang Kami</span>
                   <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 transition-transform group-hover:translate-x-1" />
@@ -148,7 +155,7 @@ export default async function HomePage() {
       </section>
 
       {/* Section 3: Venue Highlights */}
-      <section className="py-14 sm:py-20 lg:py-24 bg-white">
+      <section className="py-14 sm:py-20 lg:py-24 bg-muted/30 border-b border-border/60">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeading
             title="Pilihan Venue Eksklusif"
@@ -165,7 +172,7 @@ export default async function HomePage() {
           <div className="mt-8 sm:mt-12 text-center">
             <Link
               href="/venues"
-              className="inline-flex items-center gap-2 text-forest font-bold text-sm sm:text-base hover:text-forest-dark transition-colors"
+              className="inline-flex items-center gap-2 text-primary font-bold text-sm sm:text-base hover:text-primary/80 transition-colors"
             >
               <span>Jelajahi Semua Detail Venue</span>
               <ArrowRight className="w-4 h-4" />
@@ -175,7 +182,7 @@ export default async function HomePage() {
       </section>
 
       {/* Section 4: Jenis Acara (Event Types) */}
-      <section className="py-14 sm:py-20 lg:py-24 bg-gray-50">
+      <section className="py-14 sm:py-20 lg:py-24 bg-background border-b border-border/60">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeading
             title="Apapun Acara Anda, Kami Siap Wujudkan"
@@ -189,15 +196,15 @@ export default async function HomePage() {
               return (
                 <div
                   key={item.label}
-                  className="group bg-white p-4 sm:p-6 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col items-center text-center hover:-translate-y-1"
+                  className="group bg-card text-card-foreground p-4 sm:p-6 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-border hover:border-primary/50 flex flex-col items-center text-center hover:-translate-y-1"
                 >
-                  <div className="w-11 h-11 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-forest/10 group-hover:bg-gold/20 text-forest group-hover:text-gold transition-colors flex items-center justify-center mb-3 sm:mb-4">
+                  <div className="w-11 h-11 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all flex items-center justify-center mb-3 sm:mb-4">
                     <Icon className="w-5 h-5 sm:w-7 sm:h-7" />
                   </div>
-                  <h3 className="font-heading text-sm sm:text-base font-bold text-charcoal mb-1">
+                  <h3 className="font-heading text-sm sm:text-base font-bold text-card-foreground group-hover:text-primary transition-colors mb-1">
                     {item.label}
                   </h3>
-                  <p className="text-gray-500 text-[11px] sm:text-xs leading-relaxed line-clamp-2">
+                  <p className="text-muted-foreground text-[11px] sm:text-xs leading-relaxed line-clamp-2">
                     {item.desc}
                   </p>
                 </div>
@@ -208,14 +215,14 @@ export default async function HomePage() {
       </section>
 
       {/* Stats Counter Bar */}
-      <section className="py-12 sm:py-16 lg:py-20 bg-forest-dark relative overflow-hidden">
+      <section className="py-12 sm:py-16 lg:py-20 bg-card border-y border-border relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <StatsCounter />
         </div>
       </section>
 
       {/* Section 5: Keunggulan (Why Choose Us) */}
-      <section className="py-14 sm:py-20 lg:py-24 bg-white">
+      <section className="py-14 sm:py-20 lg:py-24 bg-background border-b border-border/60">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeading
             title="Mengapa Memilih Kebon Gede Venue?"
@@ -229,18 +236,18 @@ export default async function HomePage() {
               return (
                 <div
                   key={adv.title}
-                  className="p-5 sm:p-8 rounded-2xl sm:rounded-3xl bg-cream/70 border border-gold/15 hover:border-gold/50 transition-all duration-300 hover:shadow-lg flex flex-col group"
+                  className="p-5 sm:p-8 rounded-2xl sm:rounded-3xl bg-card text-card-foreground border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg flex flex-col group"
                 >
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-forest text-gold flex items-center justify-center mb-4 sm:mb-6 shadow-md group-hover:scale-110 transition-transform">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-primary text-primary-foreground flex items-center justify-center mb-4 sm:mb-6 shadow-md group-hover:scale-110 transition-transform">
                     <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
                   </div>
-                  <div className="text-[10px] sm:text-xs font-bold text-gold-dark tracking-widest uppercase mb-1">
+                  <div className="text-[10px] sm:text-xs font-bold text-primary tracking-widest uppercase mb-1">
                     Keunggulan 0{idx + 1}
                   </div>
-                  <h3 className="font-heading text-base sm:text-lg font-bold text-charcoal mb-2 sm:mb-3">
+                  <h3 className="font-heading text-base sm:text-lg font-bold text-card-foreground mb-2 sm:mb-3">
                     {adv.title}
                   </h3>
-                  <p className="text-gray-600 text-xs sm:text-sm leading-relaxed">
+                  <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed">
                     {adv.desc}
                   </p>
                 </div>
@@ -251,7 +258,7 @@ export default async function HomePage() {
       </section>
 
       {/* Section 6: Galeri Highlights */}
-      <section className="py-14 sm:py-20 lg:py-24 bg-gray-50">
+      <section className="py-14 sm:py-20 lg:py-24 bg-muted/30 border-b border-border/60">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeading
             title="Galeri Momen Berharga"
@@ -264,7 +271,7 @@ export default async function HomePage() {
           <div className="mt-8 sm:mt-12 text-center">
             <Link
               href="/gallery"
-              className="inline-flex items-center gap-2.5 px-6 py-3.5 sm:px-8 sm:py-4 rounded-xl bg-charcoal hover:bg-forest text-white font-semibold text-xs sm:text-sm transition-all shadow-md group"
+              className="inline-flex items-center gap-2.5 px-6 py-3.5 sm:px-8 sm:py-4 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-xs sm:text-sm transition-all shadow-md group"
             >
               <span>Lihat Semua Foto Galeri</span>
               <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 transition-transform group-hover:translate-x-1" />
@@ -274,7 +281,7 @@ export default async function HomePage() {
       </section>
 
       {/* Section 7: Testimonials */}
-      <section className="py-14 sm:py-20 lg:py-24 bg-cream">
+      <section className="py-14 sm:py-20 lg:py-24 bg-background border-b border-border/60">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeading
             title="Cerita Bahagia Klien Kami"
@@ -290,7 +297,7 @@ export default async function HomePage() {
       <CTASection />
 
       {/* Section 9: FAQ */}
-      <section className="py-14 sm:py-20 lg:py-24 bg-white">
+      <section className="py-14 sm:py-20 lg:py-24 bg-muted/30">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeading
             title="Pertanyaan yang Sering Diajukan"
@@ -300,12 +307,12 @@ export default async function HomePage() {
 
           <FAQAccordion items={displayFaqs} />
 
-          <div className="mt-8 sm:mt-12 text-center p-5 sm:p-8 rounded-2xl bg-cream border border-gold/20">
-            <p className="text-charcoal font-semibold text-sm sm:text-base mb-1.5 sm:mb-2">Punya pertanyaan lain yang belum terjawab?</p>
-            <p className="text-gray-600 text-xs sm:text-sm mb-3 sm:mb-4">Konsultasikan kebutuhan spesifik acara Anda dengan tim customer service kami.</p>
+          <div className="mt-8 sm:mt-12 text-center p-5 sm:p-8 rounded-2xl bg-card border border-border text-card-foreground shadow-sm">
+            <p className="text-card-foreground font-semibold text-sm sm:text-base mb-1.5 sm:mb-2">Punya pertanyaan lain yang belum terjawab?</p>
+            <p className="text-muted-foreground text-xs sm:text-sm mb-3 sm:mb-4">Konsultasikan kebutuhan spesifik acara Anda dengan tim customer service kami.</p>
             <Link
               href="/contact"
-              className="inline-flex items-center gap-1.5 text-forest font-bold text-xs sm:text-sm hover:underline"
+              className="inline-flex items-center gap-1.5 text-primary font-bold text-xs sm:text-sm hover:underline"
             >
               <span>Hubungi Tim Kebon Gede Sekarang</span>
               <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />

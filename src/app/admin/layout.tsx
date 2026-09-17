@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { ShieldAlert, ArrowLeft, Loader2 } from "lucide-react";
+import { ShieldAlert, ArrowLeft } from "lucide-react";
 import AdminSidebar from "@/components/admin/sidebar";
 import AdminTopbar from "@/components/admin/topbar";
 import { getCurrentAdminUser } from "@/actions/auth";
@@ -52,7 +52,7 @@ export default function AdminLayout({
 
   if (isLoginPage) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
         {children}
       </div>
     );
@@ -94,7 +94,7 @@ export default function AdminLayout({
   const access = checkAccess();
 
   return (
-    <div className="flex min-h-screen bg-gray-50 font-body text-charcoal">
+    <div className="flex min-h-screen bg-background font-sans text-foreground">
       {/* Admin Sidebar */}
       <AdminSidebar
         isOpen={sidebarOpen}

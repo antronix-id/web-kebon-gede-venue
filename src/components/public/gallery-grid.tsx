@@ -30,15 +30,15 @@ export default function GalleryGrid({ items, showFilter = true }: GalleryGridPro
     <>
       {/* Filter Tabs */}
       {showFilter && (
-        <div className="flex flex-wrap justify-center gap-2 mb-10">
+        <div className="flex overflow-x-auto no-scrollbar sm:flex-wrap sm:justify-center items-center gap-2 mb-8 sm:mb-10 px-2 pb-2 -mx-2">
           {categories.map((cat) => (
             <button
               key={cat.key}
               onClick={() => setFilter(cat.key)}
-              className={`px-5 py-2 text-sm font-medium rounded-full transition-all duration-300 ${
+              className={`px-4 py-2 sm:px-5 sm:py-2 text-xs sm:text-sm font-medium rounded-full transition-all duration-300 shrink-0 ${
                 filter === cat.key
-                  ? "bg-forest text-white shadow-lg shadow-forest/25"
-                  : "bg-white text-gray-600 hover:bg-forest/5 hover:text-forest border border-gray-200"
+                  ? "bg-primary text-primary-foreground shadow-md shadow-primary/25 scale-105 font-bold"
+                  : "bg-card text-card-foreground hover:bg-accent/20 hover:text-primary border border-border shadow-xs"
               }`}
             >
               {cat.label}
@@ -48,7 +48,7 @@ export default function GalleryGrid({ items, showFilter = true }: GalleryGridPro
       )}
 
       {/* Grid */}
-      <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4">
+      <div className="columns-1 sm:columns-2 lg:columns-3 gap-3 sm:gap-4 space-y-3 sm:space-y-4">
         {filtered.map((item, i) => (
           <motion.div
             key={item.id}
@@ -60,7 +60,7 @@ export default function GalleryGrid({ items, showFilter = true }: GalleryGridPro
             className="break-inside-avoid group cursor-pointer"
             onClick={() => setLightboxIndex(i)}
           >
-            <div className="relative overflow-hidden rounded-xl shadow-md hover:shadow-xl transition-all duration-300">
+            <div className="relative overflow-hidden rounded-2xl border border-border/80 shadow-sm hover:shadow-xl transition-all duration-300">
               <Image
                 src={item.image_url}
                 alt={item.title}
@@ -72,7 +72,7 @@ export default function GalleryGrid({ items, showFilter = true }: GalleryGridPro
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
                 <div>
                   <h4 className="text-white font-semibold text-sm">{item.title}</h4>
-                  <p className="text-white/70 text-xs mt-1">{item.description}</p>
+                  <p className="text-white/80 text-xs mt-1">{item.description}</p>
                 </div>
               </div>
             </div>

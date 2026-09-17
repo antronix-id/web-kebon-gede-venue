@@ -39,7 +39,7 @@ const defaultStats: StatItem[] = [
 
 export default function StatsCounter() {
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-6 lg:gap-8">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-5 lg:gap-8">
       {defaultStats.map((stat, idx) => {
         const Icon = stat.icon;
         return (
@@ -49,18 +49,18 @@ export default function StatsCounter() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: idx * 0.1 }}
-            className="bg-white/10 backdrop-blur-md border border-white/20 p-4 sm:p-6 lg:p-8 rounded-2xl sm:rounded-3xl text-center text-white relative group hover:bg-white/15 transition-all"
+            className="bg-card text-card-foreground border border-border p-4 sm:p-6 lg:p-8 rounded-2xl sm:rounded-3xl text-center shadow-sm hover:shadow-xl hover:border-primary/50 transition-all relative group"
           >
-            <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gold/20 flex items-center justify-center mx-auto mb-3 sm:mb-5 text-gold group-hover:scale-110 transition-transform">
+            <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto mb-3 sm:mb-5 group-hover:scale-110 transition-transform">
               <Icon className="w-5 h-5 sm:w-7 sm:h-7" />
             </div>
-            <div className="font-heading text-2xl sm:text-4xl lg:text-5xl font-extrabold text-white mb-1 sm:mb-2">
+            <div className="font-heading text-2xl sm:text-4xl lg:text-5xl font-extrabold text-primary mb-1 sm:mb-2">
               {stat.value}
             </div>
-            <div className="font-semibold text-gold-light text-xs sm:text-base mb-1">
+            <div className="font-semibold text-card-foreground text-xs sm:text-base mb-1">
               {stat.label}
             </div>
-            <p className="text-gray-200 text-[11px] sm:text-xs leading-relaxed line-clamp-2">
+            <p className="text-muted-foreground text-[11px] sm:text-xs leading-relaxed line-clamp-2">
               {stat.description}
             </p>
           </motion.div>

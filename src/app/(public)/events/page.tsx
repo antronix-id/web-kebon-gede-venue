@@ -7,7 +7,8 @@ import { getEvents } from "@/actions/events";
 
 export const metadata: Metadata = {
   title: "Agenda & Portofolio Event",
-  description: "Daftar perhelatan wedding, gathering, seminar, dan festival yang diselenggarakan di Kebon Gede Venue.",
+  description:
+    "Daftar perhelatan wedding, gathering, seminar, dan festival yang diselenggarakan di Kebon Gede Venue.",
 };
 
 export default async function EventsPage() {
@@ -16,22 +17,22 @@ export default async function EventsPage() {
   return (
     <div className="pt-16 sm:pt-20">
       {/* Hero Banner */}
-      <section className="bg-forest-dark text-white py-14 sm:py-20 lg:py-24 px-4 sm:px-6 lg:px-8 text-center relative overflow-hidden">
+      <section className="bg-primary text-primary-foreground py-14 sm:py-20 lg:py-24 px-4 sm:px-6 lg:px-8 text-center relative overflow-hidden">
         <div className="max-w-4xl mx-auto relative z-10">
-          <span className="text-gold-light text-xs sm:text-sm uppercase tracking-widest font-semibold block mb-2 sm:mb-3 font-accent">
+          <span className="text-primary-foreground/80 text-xs sm:text-sm uppercase tracking-widest font-bold block mb-2 sm:mb-3 font-sans">
             Agenda & Perhelatan
           </span>
-          <h1 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4">
+          <h1 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 text-primary-foreground">
             Event di Kebon Gede Venue
           </h1>
-          <p className="text-gray-300 text-sm sm:text-base lg:text-lg max-w-2xl mx-auto">
+          <p className="text-primary-foreground/85 text-sm sm:text-base lg:text-lg max-w-2xl mx-auto">
             Temukan inspirasi konsep acara dari ragam perhelatan bergengsi yang sukses kami selenggarakan bersama para klien istimewa kami.
           </p>
         </div>
       </section>
 
       {/* Events Grid */}
-      <section className="py-14 sm:py-20 lg:py-24 bg-cream">
+      <section className="py-14 sm:py-20 lg:py-24 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeading
             title="Daftar Acara Terselenggara"

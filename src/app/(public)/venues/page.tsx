@@ -7,7 +7,8 @@ import { getVenues } from "@/actions/venues";
 
 export const metadata: Metadata = {
   title: "Pilihan Venue",
-  description: "Jelajahi pilihan venue indoor, outdoor, dan semi-outdoor di Kebon Gede Venue Palembang. Kapasitas hingga 2.000+ tamu.",
+  description:
+    "Jelajahi pilihan venue indoor, outdoor, dan semi-outdoor di Kebon Gede Venue Palembang. Kapasitas hingga 2.000+ tamu.",
 };
 
 export default async function VenuesPage() {
@@ -16,22 +17,22 @@ export default async function VenuesPage() {
   return (
     <div className="pt-16 sm:pt-20">
       {/* Hero Banner */}
-      <section className="bg-forest-dark text-white py-14 sm:py-20 lg:py-24 px-4 sm:px-6 lg:px-8 text-center relative overflow-hidden">
+      <section className="bg-primary text-primary-foreground py-14 sm:py-20 lg:py-24 px-4 sm:px-6 lg:px-8 text-center relative overflow-hidden">
         <div className="max-w-4xl mx-auto relative z-10">
-          <span className="text-gold-light text-xs sm:text-sm uppercase tracking-widest font-semibold block mb-2 sm:mb-3 font-accent">
+          <span className="text-primary-foreground/80 text-xs sm:text-sm uppercase tracking-widest font-bold block mb-2 sm:mb-3 font-sans">
             Temukan Ruang Terbaik
           </span>
-          <h1 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4">
+          <h1 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 text-primary-foreground">
             Pilihan Venue Kebon Gede
           </h1>
-          <p className="text-gray-300 text-sm sm:text-base lg:text-lg max-w-2xl mx-auto">
+          <p className="text-primary-foreground/85 text-sm sm:text-base lg:text-lg max-w-2xl mx-auto">
             Dari suasana taman tropis asri hingga ballroom semi-outdoor berkapasitas ribuan tamu, kami memiliki ruang ideal untuk setiap momen berharga Anda.
           </p>
         </div>
       </section>
 
       {/* Venues Grid */}
-      <section className="py-14 sm:py-20 lg:py-24 bg-cream">
+      <section className="py-14 sm:py-20 lg:py-24 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeading
             title="Daftar Venue Kami"

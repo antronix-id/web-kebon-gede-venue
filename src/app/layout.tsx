@@ -1,23 +1,23 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Inter, Cormorant_Garamond } from "next/font/google";
+import { Montserrat, Merriweather, Source_Code_Pro } from "next/font/google";
 import "./globals.css";
 
-const playfair = Playfair_Display({
+const montserrat = Montserrat({
   subsets: ["latin"],
-  variable: "--font-heading",
+  variable: "--font-sans",
   display: "swap",
 });
 
-const inter = Inter({
+const merriweather = Merriweather({
   subsets: ["latin"],
-  variable: "--font-body",
+  weight: ["300", "400", "700", "900"],
+  variable: "--font-serif",
   display: "swap",
 });
 
-const cormorant = Cormorant_Garamond({
+const sourceCodePro = Source_Code_Pro({
   subsets: ["latin"],
-  variable: "--font-accent",
-  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-mono",
   display: "swap",
 });
 
@@ -55,8 +55,29 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id" className={`${playfair.variable} ${inter.variable} ${cormorant.variable}`}>
-      <body className="min-h-screen">
+    <html
+      lang="id"
+      suppressHydrationWarning
+      className={`${montserrat.variable} ${merriweather.variable} ${sourceCodePro.variable}`}
+    >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                const storedTheme = localStorage.getItem('theme');
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                if (storedTheme === 'dark' || (!storedTheme && prefersDark)) {
+                  document.documentElement.classList.add('dark');
+                } else {
+                  document.documentElement.classList.remove('dark');
+                }
+              } catch (_) {}
+            `,
+          }}
+        />
+      </head>
+      <body className="min-h-screen bg-background text-foreground font-sans antialiased selection:bg-primary/20 selection:text-primary">
         {children}
       </body>
     </html>
