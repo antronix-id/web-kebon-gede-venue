@@ -24,9 +24,37 @@ CREATE TABLE IF NOT EXISTS public.admin_users (
   full_name TEXT NOT NULL,
   role TEXT NOT NULL DEFAULT 'admin' CHECK (role IN ('super_admin', 'admin', 'editor')),
   avatar_url TEXT,
+  permissions TEXT[] DEFAULT '{"dashboard","venues","gallery","events","blog","testimonials","messages","hero-slides","faq","settings"}',
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+CREATE OR REPLACE FUNCTION public.is_admin()
+RETURNS BOOLEAN
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = public
+STABLE
+AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM public.admin_users WHERE id = auth.uid()
+  );
+$$;
+
+CREATE OR REPLACE FUNCTION public.is_super_admin()
+RETURNS BOOLEAN
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = public
+STABLE
+AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM public.admin_users WHERE id = auth.uid() AND role = 'super_admin'
+  );
+$$;
+
+GRANT EXECUTE ON FUNCTION public.is_admin() TO authenticated, service_role, anon;
+GRANT EXECUTE ON FUNCTION public.is_super_admin() TO authenticated, service_role, anon;
 
 ALTER TABLE public.admin_users ENABLE ROW LEVEL SECURITY;
 
@@ -40,12 +68,8 @@ DROP POLICY IF EXISTS "Super admin can manage all admin users" ON public.admin_u
 CREATE POLICY "Super admin can manage all admin users"
   ON public.admin_users FOR ALL
   TO authenticated
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.admin_users
-      WHERE id = auth.uid() AND role = 'super_admin'
-    )
-  );
+  USING (public.is_super_admin())
+  WITH CHECK (public.is_super_admin());
 
 CREATE OR REPLACE TRIGGER update_admin_users_updated_at
   BEFORE UPDATE ON public.admin_users
@@ -84,7 +108,7 @@ CREATE POLICY "Admins can manage venues"
   ON public.venues FOR ALL
   TO authenticated
   USING (
-    EXISTS (SELECT 1 FROM public.admin_users WHERE id = auth.uid())
+    public.is_admin()
   );
 
 CREATE OR REPLACE TRIGGER update_venues_updated_at
@@ -116,7 +140,7 @@ CREATE POLICY "Admins can manage venue images"
   ON public.venue_images FOR ALL
   TO authenticated
   USING (
-    EXISTS (SELECT 1 FROM public.admin_users WHERE id = auth.uid())
+    public.is_admin()
   );
 
 -- ============================================
@@ -146,7 +170,7 @@ CREATE POLICY "Admins can manage gallery"
   ON public.gallery_items FOR ALL
   TO authenticated
   USING (
-    EXISTS (SELECT 1 FROM public.admin_users WHERE id = auth.uid())
+    public.is_admin()
   );
 
 -- ============================================
@@ -179,7 +203,7 @@ CREATE POLICY "Admins can manage events"
   ON public.events FOR ALL
   TO authenticated
   USING (
-    EXISTS (SELECT 1 FROM public.admin_users WHERE id = auth.uid())
+    public.is_admin()
   );
 
 CREATE OR REPLACE TRIGGER update_events_updated_at
@@ -218,7 +242,7 @@ CREATE POLICY "Admins can manage blog posts"
   ON public.blog_posts FOR ALL
   TO authenticated
   USING (
-    EXISTS (SELECT 1 FROM public.admin_users WHERE id = auth.uid())
+    public.is_admin()
   );
 
 CREATE OR REPLACE TRIGGER update_blog_posts_updated_at
@@ -259,7 +283,7 @@ CREATE POLICY "Admins can manage testimonials"
   ON public.testimonials FOR ALL
   TO authenticated
   USING (
-    EXISTS (SELECT 1 FROM public.admin_users WHERE id = auth.uid())
+    public.is_admin()
   );
 
 -- ============================================
@@ -293,7 +317,7 @@ CREATE POLICY "Admins can manage contact messages"
   ON public.contact_messages FOR ALL
   TO authenticated
   USING (
-    EXISTS (SELECT 1 FROM public.admin_users WHERE id = auth.uid())
+    public.is_admin()
   );
 
 CREATE OR REPLACE TRIGGER update_contact_messages_updated_at
@@ -326,7 +350,7 @@ CREATE POLICY "Admins can manage FAQs"
   ON public.faqs FOR ALL
   TO authenticated
   USING (
-    EXISTS (SELECT 1 FROM public.admin_users WHERE id = auth.uid())
+    public.is_admin()
   );
 
 -- ============================================
@@ -353,7 +377,7 @@ CREATE POLICY "Admins can manage site settings"
   ON public.site_settings FOR ALL
   TO authenticated
   USING (
-    EXISTS (SELECT 1 FROM public.admin_users WHERE id = auth.uid())
+    public.is_admin()
   );
 
 CREATE OR REPLACE TRIGGER update_site_settings_updated_at
@@ -388,7 +412,7 @@ CREATE POLICY "Admins can manage hero slides"
   ON public.hero_slides FOR ALL
   TO authenticated
   USING (
-    EXISTS (SELECT 1 FROM public.admin_users WHERE id = auth.uid())
+    public.is_admin()
   );
 
 -- ============================================

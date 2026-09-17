@@ -21,10 +21,10 @@ export default function AdminEditVenueForm({ venue }: AdminEditVenueFormProps) {
     venue_type: venue.venue_type,
     capacity_min: venue.capacity_min,
     capacity_max: venue.capacity_max,
-    short_description: venue.short_description,
-    full_description: venue.full_description,
-    facilities: venue.facilities.join(", "),
-    hero_image_url: venue.hero_image_url,
+    short_description: venue.short_description || "",
+    full_description: venue.full_description || "",
+    facilities: Array.isArray(venue.facilities) ? venue.facilities.join(", ") : "",
+    hero_image_url: venue.hero_image_url || "",
     is_active: venue.is_active,
   });
   const [isSaved, setIsSaved] = useState(false);
@@ -45,7 +45,9 @@ export default function AdminEditVenueForm({ venue }: AdminEditVenueFormProps) {
         capacity_max: Number(formData.capacity_max),
         short_description: formData.short_description,
         full_description: formData.full_description,
-        facilities: formData.facilities.split(",").map((s) => s.trim()).filter(Boolean),
+        facilities: formData.facilities
+          ? formData.facilities.split(",").map((s) => s.trim()).filter(Boolean)
+          : [],
         hero_image_url: formData.hero_image_url,
         is_active: formData.is_active,
       });

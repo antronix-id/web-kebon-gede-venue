@@ -220,6 +220,7 @@ export function ImageUpload({
               src={currentImageUrl}
               alt="Preview"
               fill
+              sizes="(max-width: 768px) 100vw, 50vw"
               unoptimized={currentImageUrl.startsWith("blob:")}
               className="object-cover transition-transform group-hover:scale-105 duration-500"
             />

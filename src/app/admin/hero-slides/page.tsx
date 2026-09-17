@@ -190,9 +190,10 @@ export default function AdminHeroSlidesPage() {
             >
               <div className="relative aspect-[16/9] w-full bg-gray-100 overflow-hidden">
                 <Image
-                  src={slide.image_url}
+                  src={slide.image_url || "/images/1.png"}
                   alt={slide.title}
                   fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   className="object-cover group-hover:scale-105 transition-transform duration-500"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />

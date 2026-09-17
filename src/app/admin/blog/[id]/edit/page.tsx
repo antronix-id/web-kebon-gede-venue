@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { blogPosts as seedPosts } from "@/lib/seed-data";
 import { getBlogPostById } from "@/actions/blog";
-import AdminEditBlogForm from "./form";
+import AdminEditBlogForm from "@/app/admin/blog/[id]/edit/form";
 
 interface EditBlogPageProps {
   params: Promise<{ id: string }>;

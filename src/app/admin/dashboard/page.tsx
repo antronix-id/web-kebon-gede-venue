@@ -40,14 +40,14 @@ export default function AdminDashboardPage() {
         const [liveMsgs, liveEvents, livePosts, liveGallery] = await Promise.all([
           getContactMessages().catch(() => null),
           getEvents(false).catch(() => null),
-          getBlogPosts().catch(() => null),
+          getBlogPosts("all").catch(() => null),
           getGalleryItems("all").catch(() => null),
         ]);
 
-        if (liveMsgs && liveMsgs.length > 0) setMessages(liveMsgs);
-        if (liveEvents && liveEvents.length > 0) setEventCount(liveEvents.length);
-        if (livePosts && livePosts.length > 0) setPostCount(livePosts.length);
-        if (liveGallery && liveGallery.length > 0) setGalleryCount(liveGallery.length);
+        if (liveMsgs !== null) setMessages(liveMsgs);
+        if (liveEvents !== null) setEventCount(liveEvents.length);
+        if (livePosts !== null) setPostCount(livePosts.length);
+        if (liveGallery !== null) setGalleryCount(liveGallery.length);
       } catch (err) {
         console.error("Error loading dashboard data:", err);
       }

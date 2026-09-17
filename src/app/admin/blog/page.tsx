@@ -17,8 +17,8 @@ export default function AdminBlogPage() {
   useEffect(() => {
     async function loadPosts() {
       try {
-        const data = await getBlogPosts();
-        if (data && data.length > 0) {
+        const data = await getBlogPosts("all");
+        if (data) {
           setPostsList(data);
         }
       } catch (err) {
@@ -102,9 +102,10 @@ export default function AdminBlogPage() {
                       <div className="flex items-center gap-3">
                         <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-gray-100 shrink-0">
                           <Image
-                            src={post.cover_image_url}
+                            src={post.cover_image_url || "/images/1.png"}
                             alt={post.title}
                             fill
+                            sizes="48px"
                             className="object-cover"
                           />
                         </div>

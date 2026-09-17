@@ -11,9 +11,20 @@
   --color-brown: #5C3D2E;
   --color-charcoal: #1A1A1A;
 
+  --color-main: #FBF7F0;
+  --color-border: #1A1A1A;
+  --color-bw: #FFFFFF;
+  --color-mtext: #1A1A1A;
+
+  --radius-base: 14px;
+  --radius-b-base: 12px;
+
+  --shadow-shadow: 4px 4px 0px 0px #1A1A1A;
+
   --font-heading: "Playfair Display", Georgia, serif;
   --font-body: "Inter", system-ui, sans-serif;
   --font-accent: "Cormorant Garamond", Georgia, serif;
+  --font-base: "Inter", system-ui, sans-serif;
 }
 
 @layer base {
@@ -68,4 +79,31 @@ html {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #b8983e;
+}
+
+/* Radix Accordion Animations */
+@keyframes accordion-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
+.animate-accordion-down {
+  animation: accordion-down 0.25s ease-out;
+}
+
+.animate-accordion-up {
+  animation: accordion-up 0.2s ease-out;
 }

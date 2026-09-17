@@ -216,6 +216,7 @@ export default function AdminGalleryPage() {
                   src={item.image_url}
                   alt={item.title || "Foto Galeri"}
                   fill
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                   className="object-cover group-hover:scale-105 transition-transform duration-300"
                 />
                 <div className="absolute top-2 left-2">

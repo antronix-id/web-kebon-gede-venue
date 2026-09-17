@@ -36,6 +36,11 @@ export default function AdminMessagesPage() {
     loadData();
   }, []);
 
+  const handleSelectMessage = (msg: ContactMessage) => {
+    setSelectedMsg(msg);
+    setAdminNoteInput(msg.admin_notes || "");
+  };
+
   const updateStatus = async (id: string, newStatus: ContactMessage["status"]) => {
     setMessages((prev) =>
       prev.map((m) => (m.id === id ? { ...m, status: newStatus } : m))
@@ -124,7 +129,7 @@ export default function AdminMessagesPage() {
               {filteredMessages.map((msg) => (
                 <tr
                   key={msg.id}
-                  onClick={() => setSelectedMsg(msg)}
+                  onClick={() => handleSelectMessage(msg)}
                   className="hover:bg-gray-50/80 transition-colors cursor-pointer"
                 >
                   <td className="px-6 py-4">
@@ -153,7 +158,7 @@ export default function AdminMessagesPage() {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        setSelectedMsg(msg);
+                        handleSelectMessage(msg);
                       }}
                       className="px-3 py-1.5 rounded-lg bg-forest/10 text-forest hover:bg-forest hover:text-white text-xs font-semibold transition-colors"
                     >
@@ -244,9 +249,10 @@ export default function AdminMessagesPage() {
               </label>
               <div className="flex gap-2">
                 <input
+                  key={selectedMsg.id}
                   type="text"
                   placeholder="Tulis catatan (misal: sudah dikontak via WA)..."
-                  defaultValue={selectedMsg.admin_notes || ""}
+                  value={adminNoteInput}
                   onChange={(e) => setAdminNoteInput(e.target.value)}
                   className="flex-1 px-3 py-1.5 rounded-xl border border-gray-200 text-xs bg-gray-50 focus:outline-none focus:border-forest"
                 />

@@ -2,8 +2,10 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { Bell, Search, User, Menu } from "lucide-react";
+import { Bell, Menu } from "lucide-react";
 import { contactMessages } from "@/lib/seed-data";
+import AdminSearchBar from "./search-bar";
+import AdminUserDropdown from "./user-dropdown";
 
 interface AdminTopbarProps {
   onOpenSidebar?: () => void;
@@ -23,12 +25,13 @@ export default function AdminTopbar({ onOpenSidebar }: AdminTopbarProps) {
     if (pathname.includes("/admin/messages")) return "Pesan Masuk (Inbox)";
     if (pathname.includes("/admin/hero-slides")) return "Kelola Hero Slides";
     if (pathname.includes("/admin/faq")) return "Kelola FAQ";
+    if (pathname.includes("/admin/users")) return "Admin";
     if (pathname.includes("/admin/settings")) return "Pengaturan Sistem";
     return "Admin CMS";
   };
 
   return (
-    <header className="h-16 bg-white border-b border-gray-100 flex items-center justify-between px-4 sm:px-6 shrink-0">
+    <header className="h-16 bg-white border-b border-gray-100 flex items-center justify-between px-4 sm:px-6 shrink-0 sticky top-0 z-30">
       {/* Left: Hamburger & Breadcrumb */}
       <div className="flex items-center gap-2 sm:gap-3 min-w-0">
         <button
@@ -52,15 +55,8 @@ export default function AdminTopbar({ onOpenSidebar }: AdminTopbarProps) {
 
       {/* Right Controls */}
       <div className="flex items-center gap-4">
-        {/* Search */}
-        <div className="relative hidden sm:block">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Cari di CMS..."
-            className="pl-9 pr-4 py-1.5 text-xs rounded-full border border-gray-200 focus:outline-none focus:border-forest w-48 transition-all"
-          />
-        </div>
+        {/* Interactive Search Bar */}
+        <AdminSearchBar />
 
         {/* Notifications */}
         <Link
@@ -74,14 +70,9 @@ export default function AdminTopbar({ onOpenSidebar }: AdminTopbarProps) {
           )}
         </Link>
 
-        {/* User Badge */}
-        <div className="flex items-center gap-2 pl-3 border-l border-gray-200">
-          <div className="w-8 h-8 rounded-full bg-forest/10 text-forest flex items-center justify-center font-bold text-xs">
-            <User className="w-4 h-4" />
-          </div>
-          <span className="text-xs font-semibold text-charcoal hidden md:inline">
-            Administrator
-          </span>
+        {/* User Profile & Dropdown */}
+        <div className="pl-2 sm:pl-3 border-l border-gray-200">
+          <AdminUserDropdown />
         </div>
       </div>
     </header>

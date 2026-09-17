@@ -1,16 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Save } from "lucide-react";
-import { venues } from "@/lib/seed-data";
+import { venues as seedVenues } from "@/lib/seed-data";
+import { getVenues } from "@/actions/venues";
 import { createEvent } from "@/actions/events";
 import { ImageUpload } from "@/components/admin/image-upload";
 import { STORAGE_BUCKETS } from "@/lib/constants";
+import type { Venue } from "@/types";
 
 export default function AdminCreateEventPage() {
   const router = useRouter();
+  const [venuesList, setVenuesList] = useState<Venue[]>(seedVenues);
   const [formData, setFormData] = useState({
     title: "",
     slug: "",
@@ -19,9 +22,27 @@ export default function AdminCreateEventPage() {
     cover_image_url: "/images/7.png",
     event_date: new Date().toISOString().split("T")[0],
     event_type: "wedding",
-    venue_id: venues[0]?.id || "",
+    venue_id: seedVenues[0]?.id || "",
     is_published: true,
   });
+
+  useEffect(() => {
+    async function loadVenues() {
+      try {
+        const live = await getVenues(false);
+        if (live && live.length > 0) {
+          setVenuesList(live);
+          setFormData((prev) => ({
+            ...prev,
+            venue_id: prev.venue_id || live[0].id,
+          }));
+        }
+      } catch (err) {
+        console.error("Error loading venues for event create:", err);
+      }
+    }
+    loadVenues();
+  }, []);
   const [isSaved, setIsSaved] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -150,7 +171,7 @@ export default function AdminCreateEventPage() {
               onChange={(e) => setFormData({ ...formData, venue_id: e.target.value })}
               className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-forest text-sm bg-gray-50"
             >
-              {venues.map((v) => (
+              {venuesList.map((v) => (
                 <option key={v.id} value={v.id}>
                   {v.name}
                 </option>

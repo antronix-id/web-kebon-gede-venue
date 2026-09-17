@@ -70,6 +70,20 @@ export async function getCurrentAdminUser() {
       email: "admin@kebongede.com",
       full_name: "Administrator Demo",
       role: "super_admin",
+      avatar_url: "/icon1.avif",
+      permissions: [
+        "dashboard",
+        "venues",
+        "gallery",
+        "events",
+        "blog",
+        "testimonials",
+        "messages",
+        "hero-slides",
+        "faq",
+        "users",
+        "settings",
+      ],
     };
   }
 
@@ -87,11 +101,28 @@ export async function getCurrentAdminUser() {
     .eq("id", user.id)
     .single();
 
+  const allDefaultPermissions = [
+    "dashboard",
+    "venues",
+    "gallery",
+    "events",
+    "blog",
+    "testimonials",
+    "messages",
+    "hero-slides",
+    "faq",
+    "users",
+    "settings",
+  ];
+
   return {
     id: user.id,
     email: user.email || "",
     full_name: profile?.full_name || user.user_metadata?.full_name || "Admin",
     role: profile?.role || "admin",
-    avatar_url: profile?.avatar_url || null,
+    avatar_url: profile?.avatar_url || "/icon1.avif",
+    permissions: Array.isArray(profile?.permissions)
+      ? profile.permissions
+      : allDefaultPermissions,
   };
 }

@@ -129,3 +129,51 @@ export const siteSettingSchema = z.object({
 });
 
 export type SiteSettingInput = z.infer<typeof siteSettingSchema>;
+
+// 11. Admin User Management & Permissions
+export const ADMIN_MENU_KEYS = [
+  "dashboard",
+  "venues",
+  "gallery",
+  "events",
+  "blog",
+  "testimonials",
+  "messages",
+  "hero-slides",
+  "faq",
+  "users",
+  "settings",
+] as const;
+
+export const ADMIN_MENU_PERMISSIONS = [
+  { key: "dashboard", label: "Dashboard Overview", description: "Melihat ringkasan metrik & statistik" },
+  { key: "venues", label: "Kelola Venues", description: "Mengatur data ruang venue & kapasitas" },
+  { key: "gallery", label: "Kelola Galeri", description: "Upload dan kelola arsip foto" },
+  { key: "events", label: "Kelola Events", description: "Mengatur portofolio & arsip acara" },
+  { key: "blog", label: "Kelola Blog & Artikel", description: "Menulis, mengedit & publikasi artikel" },
+  { key: "testimonials", label: "Kelola Testimonials", description: "Moderasi ulasan & testimoni klien" },
+  { key: "messages", label: "Pesan Masuk (Inbox)", description: "Melihat & merespons pesan inquiry kontak" },
+  { key: "hero-slides", label: "Kelola Hero Slides", description: "Mengatur banner slider beranda" },
+  { key: "faq", label: "Kelola FAQ", description: "Mengatur daftar tanya jawab umum" },
+  { key: "users", label: "Manajemen Pengguna", description: "Kelola akun admin & hak akses modul menu" },
+  { key: "settings", label: "Pengaturan Sistem & SEO", description: "Konfigurasi kontak, medsos & meta tag" },
+] as const;
+
+export const createAdminUserSchema = z.object({
+  email: z.string().email("Format email tidak valid"),
+  password: z.string().min(6, "Password minimal 6 karakter"),
+  full_name: z.string().min(2, "Nama lengkap minimal 2 karakter"),
+  role: z.enum(["super_admin", "admin", "editor"]).default("admin"),
+  permissions: z.array(z.string()).default([]),
+});
+
+export type CreateAdminUserInput = z.infer<typeof createAdminUserSchema>;
+
+export const updateAdminUserSchema = z.object({
+  full_name: z.string().min(2, "Nama lengkap minimal 2 karakter"),
+  role: z.enum(["super_admin", "admin", "editor"]).default("admin"),
+  password: z.string().min(6, "Password baru minimal 6 karakter").optional().or(z.literal("")),
+  permissions: z.array(z.string()).default([]),
+});
+
+export type UpdateAdminUserInput = z.infer<typeof updateAdminUserSchema>;

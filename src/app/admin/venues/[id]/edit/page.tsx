@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { venues } from "@/lib/seed-data";
 import { getVenueById } from "@/actions/venues";
-import AdminEditVenueForm from "./form";
+import AdminEditVenueForm from "@/app/admin/venues/[id]/edit/form";
 
 interface EditVenuePageProps {
   params: Promise<{ id: string }>;

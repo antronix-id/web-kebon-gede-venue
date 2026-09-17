@@ -116,9 +116,10 @@ export default function AdminEventsPage() {
                         <div className="flex items-center gap-3">
                           <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-gray-100 shrink-0">
                             <Image
-                              src={evt.cover_image_url}
+                              src={evt.cover_image_url || "/images/7.png"}
                               alt={evt.title}
                               fill
+                              sizes="48px"
                               className="object-cover"
                             />
                           </div>

@@ -4,7 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import { events as seedEvents, venues } from "@/lib/seed-data";
 import { getEventById } from "@/actions/events";
 import { getVenues } from "@/actions/venues";
-import AdminEditEventForm from "./form";
+import AdminEditEventForm from "@/app/admin/events/[id]/edit/form";
 
 interface EditEventPageProps {
   params: Promise<{ id: string }>;

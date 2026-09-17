@@ -15,32 +15,44 @@ const INDONESIAN_MONTHS_SHORT = [
   "Jul", "Agu", "Sep", "Okt", "Nov", "Des"
 ];
 
-export function formatDate(dateString: string): string {
-  const parts = dateString.split("T")[0].split("-");
-  if (parts.length === 3) {
-    const year = parts[0];
-    const monthIndex = parseInt(parts[1], 10) - 1;
-    const day = parseInt(parts[2], 10);
-    if (monthIndex >= 0 && monthIndex < 12) {
-      return `${day} ${INDONESIAN_MONTHS[monthIndex]} ${year}`;
+export function formatDate(dateString?: string | null): string {
+  if (!dateString) return "-";
+  try {
+    const parts = dateString.split("T")[0].split("-");
+    if (parts.length === 3) {
+      const year = parts[0];
+      const monthIndex = parseInt(parts[1], 10) - 1;
+      const day = parseInt(parts[2], 10);
+      if (monthIndex >= 0 && monthIndex < 12 && !isNaN(day)) {
+        return `${day} ${INDONESIAN_MONTHS[monthIndex]} ${year}`;
+      }
     }
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return "-";
+    return `${date.getDate()} ${INDONESIAN_MONTHS[date.getMonth()]} ${date.getFullYear()}`;
+  } catch {
+    return "-";
   }
-  const date = new Date(dateString);
-  return `${date.getDate()} ${INDONESIAN_MONTHS[date.getMonth()]} ${date.getFullYear()}`;
 }
 
-export function formatDateShort(dateString: string): string {
-  const parts = dateString.split("T")[0].split("-");
-  if (parts.length === 3) {
-    const year = parts[0];
-    const monthIndex = parseInt(parts[1], 10) - 1;
-    const day = parseInt(parts[2], 10);
-    if (monthIndex >= 0 && monthIndex < 12) {
-      return `${day} ${INDONESIAN_MONTHS_SHORT[monthIndex]} ${year}`;
+export function formatDateShort(dateString?: string | null): string {
+  if (!dateString) return "-";
+  try {
+    const parts = dateString.split("T")[0].split("-");
+    if (parts.length === 3) {
+      const year = parts[0];
+      const monthIndex = parseInt(parts[1], 10) - 1;
+      const day = parseInt(parts[2], 10);
+      if (monthIndex >= 0 && monthIndex < 12 && !isNaN(day)) {
+        return `${day} ${INDONESIAN_MONTHS_SHORT[monthIndex]} ${year}`;
+      }
     }
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return "-";
+    return `${date.getDate()} ${INDONESIAN_MONTHS_SHORT[date.getMonth()]} ${date.getFullYear()}`;
+  } catch {
+    return "-";
   }
-  const date = new Date(dateString);
-  return `${date.getDate()} ${INDONESIAN_MONTHS_SHORT[date.getMonth()]} ${date.getFullYear()}`;
 }
 
 export function formatNumber(num: number): string {
@@ -57,7 +69,8 @@ export function slugify(text: string): string {
     .trim();
 }
 
-export function truncate(text: string, maxLength: number): string {
+export function truncate(text?: string | null, maxLength: number = 100): string {
+  if (!text) return "";
   if (text.length <= maxLength) return text;
   return text.slice(0, maxLength).trimEnd() + "...";
 }

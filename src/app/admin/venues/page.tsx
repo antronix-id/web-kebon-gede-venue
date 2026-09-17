@@ -115,9 +115,10 @@ export default function AdminVenuesPage() {
                       <div className="flex items-center gap-3">
                         <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-gray-100 shrink-0">
                           <Image
-                            src={venue.hero_image_url}
+                            src={venue.hero_image_url || "/images/1.png"}
                             alt={venue.name}
                             fill
+                            sizes="48px"
                             className="object-cover"
                           />
                         </div>
@@ -140,14 +141,14 @@ export default function AdminVenuesPage() {
 
                     <td className="px-6 py-4">
                       <div className="flex flex-wrap gap-1 max-w-xs">
-                        {venue.facilities.slice(0, 3).map((f) => (
+                        {(venue.facilities || []).slice(0, 3).map((f) => (
                           <span key={f} className="px-2 py-0.5 rounded text-[10px] bg-gray-100 text-gray-600">
                             {f}
                           </span>
                         ))}
-                        {venue.facilities.length > 3 && (
+                        {(venue.facilities || []).length > 3 && (
                           <span className="px-2 py-0.5 rounded text-[10px] bg-gray-100 text-gray-500">
-                            +{venue.facilities.length - 3} lagi
+                            +{(venue.facilities || []).length - 3} lagi
                           </span>
                         )}
                       </div>
